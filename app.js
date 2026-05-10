@@ -1242,6 +1242,9 @@ function exportCode() {
     if (build.powers.every(p => p === null)) return showMessage("Your build is empty!", "error");
     
     let toB36 = (num) => (num === "" || num === null || num === undefined) ? "" : Number(num).toString(36);
+    
+    // NEW: Helper function to strip trailing dots from empty array slots
+    let trimTrailing = (str) => str.replace(/\.+$/, '');
 
     let setIdx = toB36(powersets.findIndex(p => p.id === build.set));
     
@@ -1255,7 +1258,7 @@ function exportCode() {
         if (advIndices.length > 0) pStr += "_" + advIndices.map(toB36).join('_');
         return pStr;
     });
-    let powerString = pParts.join('.');
+    let powerString = trimTrailing(pParts.join('.'));
     
     let getTreeIdx = (tid) => tid ? specializations.findIndex(t => t.id.toString() === tid.toString()) : "";
     let getMasteryIdx = (tid) => tid ? specializations.findIndex(t => t.mastery && t.mastery.id.toString() === tid.toString()) : "";
@@ -1268,23 +1271,25 @@ function exportCode() {
         let pIdx = allPerks.findIndex(p => p.id === k);
         return pIdx !== -1 ? `${toB36(pIdx)}_${toB36(build.specs.points[k])}` : null;
     }).filter(x => x !== null);
-    let specString = tParams.join('.') + "~" + pParams.join('.');
+    let specString = trimTrailing(tParams.join('.')) + "~" + trimTrailing(pParams.join('.'));
 
     let getStatIdx = (s) => s ? STAT_TREES.indexOf(s) : "";
-    let statString = [getStatIdx(build.stats.primary), getStatIdx(build.stats.sec1), getStatIdx(build.stats.sec2)].map(toB36).join('.');
+    let statString = trimTrailing([getStatIdx(build.stats.primary), getStatIdx(build.stats.sec1), getStatIdx(build.stats.sec2)].map(toB36).join('.'));
     
-    let dParams = build.devices.map(d => d !== null ? toB36(devices.findIndex(x => x.id === d)) : "").join('.');
+    let dParams = trimTrailing(build.devices.map(d => d !== null ? toB36(devices.findIndex(x => x.id === d)) : "").join('.'));
     
     let cPolarity = build.cams && build.cams.polarity === 'Green' ? 1 : 0;
     let cLevel = build.cams ? build.cams.level : 0;
-    let cParams = `${toB36(cPolarity)}.${toB36(cLevel)}`;
+    let cParams = trimTrailing(`${toB36(cPolarity)}.${toB36(cLevel)}`);
     
-    let vParams = build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.');
+    let vParams = trimTrailing(build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.'));
 
-    // Final code completely drops base64 'btoa'
-    const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
+    // Assemble the code
+    let finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
     
-    // Automatically grabs the current domain and path
+    // NEW: Strip any trailing dashes off the very end of the URL if the final categories are completely empty
+    finalCode = finalCode.replace(/[-]+$/, '');
+    
     const currentUrl = window.location.origin + window.location.pathname; 
     const fullExportLink = `${currentUrl}?b=${finalCode}`;
     

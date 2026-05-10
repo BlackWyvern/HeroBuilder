@@ -46,7 +46,7 @@ find her herocreator at   https://aesica.net/co/beta/herocreator.htm
 Updated spec information comes from behemoth kings Powerhouse project
 you can find it here    https://woof-wolf.github.io/powerhouse/index.html
 
-==============================  CONTRIBUTORS & TESTERS ================================
+======================  CONTRIBUTORS & TESTERS ======================
 
 NightSinger - Provided the initial list of powers when first making the app
 

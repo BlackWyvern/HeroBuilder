@@ -8,7 +8,7 @@ function applySmartZoom() {
     const widthRatio = currentWidth / targetWidth;
     const heightRatio = currentHeight / targetHeight;
     let finalZoom = Math.min(widthRatio, heightRatio);
-    finalZoom = Math.min(finalZoom, 1.25);
+    finalZoom = Math.min(finalZoom, 1.0);
     document.body.style.zoom = finalZoom;
 }
 applySmartZoom();
@@ -56,16 +56,6 @@ if (!document.getElementById('hud-layout-overrides')) {
     `);
 }
 // ----------------------------------------
-
-let isDevMode = false;
-let itemBeingEdited = null;
-let itemBeingEditedType = null; 
-let lastEditedItem = null; 
-let currentWorkingScale = 1.0; 
-
-let isSelecting = false;
-let startX = 0, startY = 0;
-let currentSelection = { x: 0, y: 0, w: 42, h: 42 };
 
 // Custom Stat Colors Map
 const STAT_COLORS = {
@@ -151,7 +141,7 @@ const powerVariants = [
     { id: "v_shocking_strikes", name: "Shocking Strikes" },
     { id: "v_bolting_fervor", name: "Bolting Fervor" },
     { id: "v_ray_tracer", name: "Ray Tracer" },
-    { id: "v_hellrend", name: "Hellrend" },
+    { id: "v_hellrend", name: "Tendrils of Anguish" },
     { id: "v_tendrils_of_anguish", name: "Tendrils of Anguish" },
     { id: "v_cryoclysm", name: "Cryoclysm" },
     { id: "v_stormpiercer", name: "Stormpiercer" },
@@ -316,13 +306,6 @@ window.jumpToPower = function(id, e) {
 
 function togglePower(id) {
     let pwr = powers.find(p => p.id === id);
-    if (isDevMode) {
-        itemBeingEditedType = 'power'; itemBeingEdited = pwr;
-        document.getElementById('sprite-image').src = itemBeingEdited.image || "spritesheet.png";
-        document.getElementById('crop-scale').value = (itemBeingEdited.width === 0) ? currentWorkingScale : itemBeingEdited.renderScale;
-        document.getElementById('sprite-modal').style.display = 'block';
-        return; 
-    }
 
     let existingIndex = build.powers.indexOf(id);
     if(existingIndex !== -1) {
@@ -457,7 +440,6 @@ function renderVariantSelectionModal() {
         let isSelected = build.variants.includes(v.id);
         let selectedStyle = isSelected ? `border-color: #4DA8DA; background: rgba(77, 168, 218, 0.1);` : ``;
         
-        // Render variant purely as text/button (No Icon)
         html += `
         <div class="power" style="${selectedStyle} padding: 15px; text-align: center;" onclick="setVariantForSlot('${v.id}')">
             <div class="name" style="font-size: 16px;">${v.name}</div>
@@ -536,7 +518,6 @@ function renderDeviceSelectionModal() {
             <span id="${safeCatId}-btn" style="display: inline-block; width: 30px; color: #ffeb3b;">[+]</span> ${category}
         </h3>`;
 
-        // Streamlined grid layout (280px columns instead of 700px)
         html += `<div id="${safeCatId}" class="grid" style="display: none; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: start; margin-bottom: 30px; gap: 15px;">`;
         
         deviceGroups[category].forEach(d => {
@@ -545,7 +526,6 @@ function renderDeviceSelectionModal() {
             
             let plainDesc = d.desc.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
             
-            // Removed icon, smaller padding, centered text
             html += `
             <div class="power" style="${selectedStyle} padding: 12px; text-align: center;" onclick="setDeviceForSlot('${d.id}')" title="${plainDesc}">
                 <div class="name" style="font-size: 16px;">${d.name}</div>
@@ -847,7 +827,6 @@ function renderPerkModal() {
             div.style = boxColor;
             if (isTierLocked && pts === 0) div.style.opacity = "0.4"; 
 
-            // HUD and Modal now both use the exact same tooltip design logic
             div.innerHTML = `
                 ${buildSpriteHTML(perk, 1.4)}
                 <div class="spec-perk-info" style="flex-grow: 1;">
@@ -1005,7 +984,6 @@ function renderSpecsHUD() {
                 
                 let perksHtml = '';
                 activePerks.forEach(p => {
-                    // CHANGED: Added cursor pointer and the injected tooltip specific to this perk icon
                     perksHtml += `
                         <div class="active-perk-icon" style="position: relative; margin-bottom: 4px; cursor: help;">
                             ${buildSpriteHTML(p, 1.15)}
@@ -1098,7 +1076,7 @@ function render() {
     powersets.forEach(pset => {
         let div = document.createElement('div');
         div.className = `powerset-tab ${currentSet === pset.id ? 'active' : ''}`;
-        div.onclick = () => isDevMode ? editPowersetTab(pset.id) : setPowerset(pset.id);
+        div.onclick = () => setPowerset(pset.id);
         div.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; gap: 6px;">${buildSpriteHTML(pset, 0.35)}<span style="font-size: 15px; font-weight: bold;">${pset.name}</span></div>`; 
         nav.appendChild(div);
     });
@@ -1217,7 +1195,7 @@ function render() {
             div.appendChild(header);
             div.onclick = () => togglePower(power.id);
 
-            if (isSelected && isExpanded && !isDevMode) {
+            if (isSelected && isExpanded) {
                 let currentPoints = 0;
                 let activeAdvs = build.adv[power.id] || [];
                 activeAdvs.forEach(aName => {
@@ -1259,41 +1237,76 @@ function showMessage(msg, type = "info") {
     setTimeout(() => { el.innerText = ''; }, 3000);
 }
 
+// --- NEW "LITE COMPRESSION" EXPORT ENGINE ---
 function exportCode() {
-    let cleanBuild = build.powers.filter(p => p !== null);
-    if (cleanBuild.length === 0) return showMessage("Your build is empty!", "error");
+    if (build.powers.every(p => p === null)) return showMessage("Your build is empty!", "error");
     
-    let parts = cleanBuild.map(pid => `${pid}:${(build.adv[pid]||[]).join(',')}`);
-    let powerString = parts.join('|');
+    // Set map
+    let setIdx = powersets.findIndex(p => p.id === build.set);
     
-    let tParams = [build.specs.primary !== null ? build.specs.primary : "", build.specs.sec1 !== null ? build.specs.sec1 : "", build.specs.sec2 !== null ? build.specs.sec2 : "", build.specs.mastery !== null ? build.specs.mastery : ""];
-    let pParams = Object.keys(build.specs.points).map(k => `${k}:${build.specs.points[k]}`);
+    // Powers map
+    let pParts = build.powers.map(pid => {
+        if (pid === null) return "";
+        let pIdx = powers.findIndex(p => p.id === pid);
+        if (pIdx === -1) return "";
+        let pObj = powers[pIdx];
+        let advIndices = (build.adv[pid] || []).map(aName => pObj.adv.findIndex(a => a.name === aName)).filter(i => i !== -1);
+        return `${pIdx}:${advIndices.join(',')}`;
+    });
+    let powerString = pParts.join('|');
+    
+    // Specs map
+    let getTreeIdx = (tid) => tid ? specializations.findIndex(t => t.id.toString() === tid.toString()) : "";
+    let getMasteryIdx = (tid) => tid ? specializations.findIndex(t => t.mastery && t.mastery.id.toString() === tid.toString()) : "";
+    let tParams = [getTreeIdx(build.specs.primary), getTreeIdx(build.specs.sec1), getTreeIdx(build.specs.sec2), getMasteryIdx(build.specs.mastery)];
+    
+    let allPerks = []; 
+    specializations.forEach(t => allPerks = allPerks.concat(t.perks));
+    let pParams = Object.keys(build.specs.points).map(k => {
+        let pIdx = allPerks.findIndex(p => p.id === k);
+        return pIdx !== -1 ? `${pIdx}:${build.specs.points[k]}` : null;
+    }).filter(x => x !== null);
     let specString = tParams.join('|') + "#" + pParams.join('|');
 
-    let statString = [build.stats.primary || "", build.stats.sec1 || "", build.stats.sec2 || ""].join('|');
-    let dParams = build.devices.map(d => d !== null ? d : "").join(',');
+    // Stats map
+    let getStatIdx = (s) => s ? STAT_TREES.indexOf(s) : "";
+    let statString = [getStatIdx(build.stats.primary), getStatIdx(build.stats.sec1), getStatIdx(build.stats.sec2)].join('|');
     
-    let cParams = (build.cams ? build.cams.polarity : "Blue") + "," + (build.cams ? build.cams.level : 0);
+    // Devices map
+    let dParams = build.devices.map(d => d !== null ? devices.findIndex(x => x.id === d) : "").join(',');
     
-    // Package up the variants array
-    let vParams = build.variants.map(v => v !== null ? v : "").join(',');
+    // CAMS map
+    let cPolarity = build.cams && build.cams.polarity === 'Green' ? 1 : 0;
+    let cLevel = build.cams ? build.cams.level : 0;
+    let cParams = `${cPolarity},${cLevel}`;
+    
+    // Variants map
+    let vParams = build.variants.map(v => v !== null ? powerVariants.findIndex(x => x.id === v) : "").join(',');
 
-    // Add vParams to the end of the final string
-    const finalCode = btoa(`${build.set}*${powerString}*${specString}*${statString}*${dParams}*${cParams}*${vParams}`);
+    const finalCode = btoa(`${setIdx}*${powerString}*${specString}*${statString}*${dParams}*${cParams}*${vParams}`);
+    
+    const currentUrl = window.location.origin + window.location.pathname;
+    const fullExportLink = `${currentUrl}?build=${encodeURIComponent(finalCode)}`;
     
     const exportInput = document.getElementById('export-link');
-    exportInput.value = finalCode;
-    navigator.clipboard.writeText(finalCode).then(() => showMessage("Code copied to clipboard!", "success")).catch(() => {
-        exportInput.select(); document.execCommand('copy'); showMessage("Code generated! Please copy manually.", "success");
+    exportInput.value = fullExportLink;
+    
+    navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
+        exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
     });
 }
 
-// --- IMPORT ENGINE ---
-function importCode() {
-    let importElement = document.getElementById('import-code');
-    if (!importElement) return;
+// --- NEW HYBRID IMPORT ENGINE ---
+function importCode(providedCode = null) {
+    let inputStr = providedCode;
     
-    let inputStr = importElement.value.trim();
+    if (!inputStr) {
+        let importElement = document.getElementById('import-code');
+        if (!importElement) return;
+        inputStr = importElement.value.trim();
+        importElement.value = ''; 
+    }
+
     if (!inputStr) return;
 
     if (inputStr.includes("http") && (inputStr.includes("v=") || inputStr.includes("d="))) {
@@ -1367,12 +1380,7 @@ function importCode() {
                     let matchedLocalDevice = devices.find(localDev => 
                         localDev.name && localDev.name.toLowerCase().replace(/[^a-z0-9]/g, '') === searchName
                     );
-                    
-                    if (matchedLocalDevice) {
-                        newBuild.devices[i] = parseInt(matchedLocalDevice.id);
-                    } else {
-                        console.warn(`Importer Warning: Could not find local device matching: "${plainTextData.devices[i]}"`);
-                    }
+                    if (matchedLocalDevice) newBuild.devices[i] = parseInt(matchedLocalDevice.id);
                 }
             }
         }
@@ -1385,7 +1393,6 @@ function importCode() {
             activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
             if(typeof render === "function") render(); 
             if(typeof showMessage === "function") showMessage("Legacy build translated successfully!", "success"); 
-            importElement.value = '';
         } else {
             if(typeof showMessage === "function") showMessage("Could not map any powers to your database.", "error");
         }
@@ -1394,166 +1401,222 @@ function importCode() {
 
     try {
         let raw = atob(inputStr);
-        // Added an extra empty string fallback so old codes don't break when looking for variants
         let blocks = raw.includes('*') ? raw.split('*') : [raw.split('|').shift(), raw.split('|').slice(1).join('|'), "|||#", "||", "", "", ""];
         
-        const loadedSet = blocks[0];
-        let newBuild = { 
-            set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
-            powers: new Array(14).fill(null), adv: {},
-            specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
-            devices: new Array(5).fill(null),
-            variants: new Array(5).fill(null),
-            cams: { polarity: 'Blue', level: 0 }
-        };
-        
-        let index = 0;
-        let pwrSections = blocks[1] ? blocks[1].split('|') : [];
-        pwrSections.forEach(sec => {
-            let [pid, advString] = sec.split(':');
-            if (powers.find(p => p.id === pid)) {
-                newBuild.powers[index] = pid;
-                newBuild.adv[pid] = advString ? advString.split(',') : [];
-                index++;
-            }
-        });
+        // Detect if this is the Old format (text string like "force") or New format (number index like "0")
+        let isLiteFormat = !isNaN(parseInt(blocks[0])) && !isNaN(blocks[0] - 0);
 
-        if(blocks[2]) {
-            let specHalves = blocks[2].split('#');
-            let tData = specHalves[0].split('|');
-            if(tData[0]) newBuild.specs.primary = tData[0];
-            if(tData[1]) newBuild.specs.sec1 = tData[1];
-            if(tData[2]) newBuild.specs.sec2 = tData[2];
-            if(tData[3]) newBuild.specs.mastery = tData[3];
+        if (isLiteFormat) {
+            // --- NEW LITE COMPRESSION LOADER ---
+            let setIdx = parseInt(blocks[0]);
+            let loadedSet = powersets[setIdx] ? powersets[setIdx].id : null;
+            if(!loadedSet) return showMessage("Invalid build code.", "error");
 
-            if(specHalves[1]) {
-                let pData = specHalves[1].split('|');
-                pData.forEach(pChunk => {
-                    let [pid, pts] = pChunk.split(':');
-                    if(pid && pts) newBuild.specs.points[pid] = Number(pts);
-                });
-            }
-        }
+            let newBuild = { 
+                set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
+                powers: new Array(14).fill(null), adv: {},
+                specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
+                devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+                cams: { polarity: 'Blue', level: 0 }
+            };
 
-        if(blocks[3]) {
-            let sData = blocks[3].split('|');
-            if(sData[0]) newBuild.stats.primary = sData[0];
-            if(sData[1]) newBuild.stats.sec1 = sData[1];
-            if(sData[2]) newBuild.stats.sec2 = sData[2];
-        }
+            // Powers
+            if (blocks[1]) {
+                let pwrSections = blocks[1].split('|');
+                for(let i = 0; i < 14 && i < pwrSections.length; i++) {
+                    if(pwrSections[i] === "") continue;
+                    let [pIdxStr, advString] = pwrSections[i].split(':');
+                    let pIdx = parseInt(pIdxStr);
+                    if (!isNaN(pIdx) && powers[pIdx]) {
+                        let pId = powers[pIdx].id;
+                        newBuild.powers[i] = pId;
+                        newBuild.adv[pId] = [];
+                        if (advString) {
+                            advString.split(',').forEach(aIdxStr => {
+                                let aIdx = parseInt(aIdxStr);
+                                if (!isNaN(aIdx) && powers[pIdx].adv && powers[pIdx].adv[aIdx]) {
+                                    newBuild.adv[pId].push(powers[pIdx].adv[aIdx].name);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
 
-        if(blocks[4]) {
-            let dData = blocks[4].split(',');
-            for(let i=0; i<5 && i<dData.length; i++) {
-                if(dData[i] && dData[i] !== "") newBuild.devices[i] = parseInt(dData[i]);
+            // Specs
+            if (blocks[2]) {
+                let specHalves = blocks[2].split('#');
+                if(specHalves[0]) {
+                    let tData = specHalves[0].split('|');
+                    let getTree = (idx) => (idx !== "" && specializations[parseInt(idx)]) ? specializations[parseInt(idx)].id : null;
+                    newBuild.specs.primary = getTree(tData[0]);
+                    newBuild.specs.sec1 = getTree(tData[1]);
+                    newBuild.specs.sec2 = getTree(tData[2]);
+                    
+                    let masterTreeIdx = tData[3];
+                    if(masterTreeIdx !== "" && specializations[parseInt(masterTreeIdx)] && specializations[parseInt(masterTreeIdx)].mastery) {
+                        newBuild.specs.mastery = specializations[parseInt(masterTreeIdx)].mastery.id;
+                    }
+                }
+                if(specHalves[1]) {
+                    let allPerks = []; specializations.forEach(t => allPerks = allPerks.concat(t.perks));
+                    let pData = specHalves[1].split('|');
+                    pData.forEach(pChunk => {
+                        let [pIdxStr, pts] = pChunk.split(':');
+                        if(pIdxStr && pts) {
+                            let pIdx = parseInt(pIdxStr);
+                            if(allPerks[pIdx]) newBuild.specs.points[allPerks[pIdx].id] = Number(pts);
+                        }
+                    });
+                }
             }
-        }
-        
-        if(blocks[5]) {
-            let cData = blocks[5].split(',');
-            if(cData[0] && cData[1] !== undefined) {
-                newBuild.cams = { polarity: cData[0], level: parseInt(cData[1]) };
+
+            // Stats
+            if (blocks[3]) {
+                let sData = blocks[3].split('|');
+                let getStat = (idx) => (idx !== "" && STAT_TREES[parseInt(idx)]) ? STAT_TREES[parseInt(idx)] : null;
+                newBuild.stats.primary = getStat(sData[0]);
+                newBuild.stats.sec1 = getStat(sData[1]);
+                newBuild.stats.sec2 = getStat(sData[2]);
             }
-        }
-        
-        // Unpack the variants if they exist in the code
-        if(blocks[6]) {
-            let vData = blocks[6].split(',');
-            for(let i=0; i<5 && i<vData.length; i++) {
-                if(vData[i] && vData[i] !== "") newBuild.variants[i] = vData[i];
+
+            // Devices
+            if (blocks[4]) {
+                let dData = blocks[4].split(',');
+                for(let i=0; i<5 && i<dData.length; i++) {
+                    if(dData[i] !== "") {
+                        let dIdx = parseInt(dData[i]);
+                        if(!isNaN(dIdx) && devices[dIdx]) newBuild.devices[i] = devices[dIdx].id;
+                    }
+                }
             }
-        }
-        
-        if (newBuild.powers.some(p => p !== null)) {
-            build = newBuild;
-            if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
-            expandedPowerId = null; 
-            let nextEmpty = build.powers.indexOf(null);
-            activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
-            if(typeof render === "function") render(); 
-            if(typeof showMessage === "function") showMessage("Build loaded successfully!", "success"); 
-            importElement.value = '';
+
+            // CAMS
+            if (blocks[5]) {
+                let cData = blocks[5].split(',');
+                if(cData[0] !== "" && cData[1] !== undefined) {
+                    newBuild.cams = { polarity: cData[0] == "1" ? 'Green' : 'Blue', level: parseInt(cData[1]) };
+                }
+            }
+
+            // Variants
+            if (blocks[6]) {
+                let vData = blocks[6].split(',');
+                for(let i=0; i<5 && i<vData.length; i++) {
+                    if(vData[i] !== "") {
+                        let vIdx = parseInt(vData[i]);
+                        if(!isNaN(vIdx) && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
+                    }
+                }
+            }
+            
+            if (newBuild.powers.some(p => p !== null)) {
+                build = newBuild;
+                if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
+                expandedPowerId = null; 
+                let nextEmpty = build.powers.indexOf(null);
+                activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
+                if(typeof render === "function") render(); 
+                if(typeof showMessage === "function") showMessage("Build loaded successfully!", "success"); 
+            } else {
+                if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+            }
+            
         } else {
-            if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+            // --- OLD LEGACY LOADER ---
+            const loadedSet = blocks[0];
+            let newBuild = { 
+                set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
+                powers: new Array(14).fill(null), adv: {},
+                specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
+                devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+                cams: { polarity: 'Blue', level: 0 }
+            };
+            
+            let index = 0;
+            let pwrSections = blocks[1] ? blocks[1].split('|') : [];
+            pwrSections.forEach(sec => {
+                let [pid, advString] = sec.split(':');
+                if (powers.find(p => p.id === pid)) {
+                    newBuild.powers[index] = pid;
+                    newBuild.adv[pid] = advString ? advString.split(',') : [];
+                    index++;
+                }
+            });
+
+            if(blocks[2]) {
+                let specHalves = blocks[2].split('#');
+                let tData = specHalves[0].split('|');
+                if(tData[0]) newBuild.specs.primary = tData[0];
+                if(tData[1]) newBuild.specs.sec1 = tData[1];
+                if(tData[2]) newBuild.specs.sec2 = tData[2];
+                if(tData[3]) newBuild.specs.mastery = tData[3];
+
+                if(specHalves[1]) {
+                    let pData = specHalves[1].split('|');
+                    pData.forEach(pChunk => {
+                        let [pid, pts] = pChunk.split(':');
+                        if(pid && pts) newBuild.specs.points[pid] = Number(pts);
+                    });
+                }
+            }
+
+            if(blocks[3]) {
+                let sData = blocks[3].split('|');
+                if(sData[0]) newBuild.stats.primary = sData[0];
+                if(sData[1]) newBuild.stats.sec1 = sData[1];
+                if(sData[2]) newBuild.stats.sec2 = sData[2];
+            }
+
+            if(blocks[4]) {
+                let dData = blocks[4].split(',');
+                for(let i=0; i<5 && i<dData.length; i++) {
+                    if(dData[i] && dData[i] !== "") newBuild.devices[i] = parseInt(dData[i]);
+                }
+            }
+            
+            if(blocks[5]) {
+                let cData = blocks[5].split(',');
+                if(cData[0] && cData[1] !== undefined) {
+                    newBuild.cams = { polarity: cData[0], level: parseInt(cData[1]) };
+                }
+            }
+            
+            if(blocks[6]) {
+                let vData = blocks[6].split(',');
+                for(let i=0; i<5 && i<vData.length; i++) {
+                    if(vData[i] && vData[i] !== "") newBuild.variants[i] = vData[i];
+                }
+            }
+            
+            if (newBuild.powers.some(p => p !== null)) {
+                build = newBuild;
+                if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
+                expandedPowerId = null; 
+                let nextEmpty = build.powers.indexOf(null);
+                activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
+                if(typeof render === "function") render(); 
+                if(typeof showMessage === "function") showMessage("Legacy build loaded successfully!", "success"); 
+            } else {
+                if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+            }
         }
     } catch (e) { 
         if(typeof showMessage === "function") showMessage("Failed to read code.", "error"); 
     }
 }
 
-function getExactNativeCoords(e, img) {
-    const rect = img.getBoundingClientRect();
-    return { x: (e.clientX - rect.left) * (img.naturalWidth / rect.width), y: (e.clientY - rect.top) * (img.naturalHeight / rect.height) };
-}
-
-function initCropTool() {
-    const img = document.getElementById('sprite-image'), selBox = document.getElementById('selection-box'), btn = document.getElementById('crop-confirm-btn');
-    if (!img) return; 
-    document.getElementById('img-wrapper').addEventListener('mousedown', e => {
-        if(e.target !== img) return;
-        isSelecting = true; const pos = getExactNativeCoords(e, img);
-        startX = pos.x; startY = pos.y;
-        selBox.style.left = startX + 'px'; selBox.style.top = startY + 'px';
-        selBox.style.width = '0px'; selBox.style.height = '0px'; selBox.style.display = 'block'; btn.style.display = 'none';
-    });
-    window.addEventListener('mousemove', e => {
-        if (!isSelecting) return;
-        const pos = getExactNativeCoords(e, img);
-        const currX = Math.max(0, Math.min(pos.x, img.naturalWidth)), currY = Math.max(0, Math.min(pos.y, img.naturalHeight));
-        const left = Math.min(startX, currX), top = Math.min(startY, currY);
-        const width = Math.abs(currX - startX), height = Math.abs(currY - startY);
-        selBox.style.left = left + 'px'; selBox.style.top = top + 'px'; selBox.style.width = width + 'px'; selBox.style.height = height + 'px';
-        currentSelection = { x: left, y: top, w: width, h: height };
-    });
-    window.addEventListener('mouseup', () => { if (isSelecting) { isSelecting = false; if (currentSelection.w > 5) btn.style.display = 'inline-block'; }});
-}
-try { initCropTool(); } catch (e) {}
-
-function confirmCrop() {
-    let scale = parseFloat(document.getElementById('crop-scale').value) || 1.0;
-    currentWorkingScale = scale; 
-    if (itemBeingEdited) {
-        itemBeingEdited.spriteX = Math.round(currentSelection.x); itemBeingEdited.spriteY = Math.round(currentSelection.y);
-        itemBeingEdited.width = Math.round(currentSelection.w); itemBeingEdited.height = Math.round(currentSelection.h);
-        itemBeingEdited.renderScale = scale; lastEditedItem = itemBeingEdited;
-        document.getElementById('live-scale-slider').value = scale; document.getElementById('live-scale-display').innerText = scale.toFixed(1) + "x";
+// --- AUTO-LOAD BUILD FROM URL ---
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const incomingBuildCode = urlParams.get('build');
+    
+    if (incomingBuildCode) {
+        setTimeout(() => {
+            importCode(incomingBuildCode); 
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 100);
     }
-    closeModal(); updateDevDump(); render();
-}
-
-function updateLiveScale(val) {
-    currentWorkingScale = parseFloat(val); 
-    document.getElementById('live-scale-display').innerText = currentWorkingScale.toFixed(1) + "x";
-    if (lastEditedItem) { lastEditedItem.renderScale = currentWorkingScale; updateDevDump(); render(); renderPerkModal(); }
-}
-
-function closeModal() { document.getElementById('sprite-modal').style.display = 'none'; document.getElementById('selection-box').style.display = 'none'; document.getElementById('crop-confirm-btn').style.display = 'none'; itemBeingEdited = null; }
-
-function toggleDevMode() {
-    isDevMode = !isDevMode; let btn = document.getElementById('dev-mode-btn'), panel = document.getElementById('dev-panel');
-    if (isDevMode) { btn.style.background = "#4CAF50"; btn.innerText = "Developer Mode ACTIVE (Click an icon to edit it)"; panel.style.display = "block"; updateDevDump(); } 
-    else { btn.style.background = "#ff5555"; btn.innerText = "Enable Developer Sprite Mode"; panel.style.display = "none"; }
-    render();
-}
-
-function editPowersetTab(id) {
-    itemBeingEditedType = 'powerset'; itemBeingEdited = powersets.find(p => p.id === id);
-    document.getElementById('sprite-image').src = itemBeingEdited.image || "sprites.png"; 
-    document.getElementById('crop-scale').value = (itemBeingEdited.width === 0) ? currentWorkingScale : itemBeingEdited.renderScale;
-    document.getElementById('sprite-modal').style.display = 'flex';
-}
-
-function updateDevDump() {
-    let entries = [];
-    powersets.forEach(p => { if (p.width > 0 && p.height > 0) entries.push(`    "${p.id}": { spriteX: ${p.spriteX}, spriteY: ${p.spriteY}, width: ${p.width}, height: ${p.height}, renderScale: ${p.renderScale} }`); });
-    powers.forEach(p => { if (p.width > 0 && p.height > 0) entries.push(`    "${p.id}": { spriteX: ${p.spriteX}, spriteY: ${p.spriteY}, width: ${p.width}, height: ${p.height}, renderScale: ${p.renderScale} }`); });
-    if(typeof specializations !== 'undefined') {
-        specializations.forEach(t => {
-            t.perks.forEach(p => { if (p.width > 0) entries.push(`    "${p.id}": { spriteX: ${p.spriteX}, spriteY: ${p.spriteY}, width: ${p.width}, height: ${p.height}, renderScale: ${p.renderScale} }`); });
-            if(t.mastery && t.mastery.width > 0) entries.push(`    "${t.mastery.id}": { spriteX: ${t.mastery.spriteX}, spriteY: ${t.mastery.spriteY}, width: ${t.mastery.width}, height: ${t.mastery.height}, renderScale: ${t.mastery.renderScale} }`);
-        });
-    }
-    document.getElementById('dev-output').value = "const iconPlacements = {\n" + entries.join(",\n") + "\n};";
-}
+});
 
 setTimeout(render, 200);

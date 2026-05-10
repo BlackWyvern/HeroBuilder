@@ -40,10 +40,12 @@ You are absolutely free to use, modify, and distribute this software. However, a
 ==============================  CREDITS  ==================================
 
 A large majority of the informaion in this planner relies on Aesica's database files
-and this project would not be possible without her foundation
+and this project would not be possible without her foundation.
+
 find her herocreator at   https://aesica.net/co/beta/herocreator.htm
 
 Updated spec information comes from behemoth kings Powerhouse project
+
 you can find it here    https://woof-wolf.github.io/powerhouse/index.html
 
 ======================  CONTRIBUTORS & TESTERS ======================

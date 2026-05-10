@@ -8,7 +8,7 @@ function applySmartZoom() {
     const widthRatio = currentWidth / targetWidth;
     const heightRatio = currentHeight / targetHeight;
     let finalZoom = Math.min(widthRatio, heightRatio);
-    finalZoom = Math.min(finalZoom, 1.0);
+    finalZoom = Math.min(finalZoom, 1.0); // User scale preference maintained
     document.body.style.zoom = finalZoom;
 }
 applySmartZoom();
@@ -1237,56 +1237,56 @@ function showMessage(msg, type = "info") {
     setTimeout(() => { el.innerText = ''; }, 3000);
 }
 
-// --- NEW "LITE COMPRESSION" EXPORT ENGINE ---
+// --- NEW V3 BASE36 EXPORT ENGINE ---
 function exportCode() {
     if (build.powers.every(p => p === null)) return showMessage("Your build is empty!", "error");
     
-    // Set map
-    let setIdx = powersets.findIndex(p => p.id === build.set);
+    let toB36 = (num) => (num === "" || num === null || num === undefined) ? "" : Number(num).toString(36);
+
+    let setIdx = toB36(powersets.findIndex(p => p.id === build.set));
     
-    // Powers map
     let pParts = build.powers.map(pid => {
         if (pid === null) return "";
         let pIdx = powers.findIndex(p => p.id === pid);
         if (pIdx === -1) return "";
         let pObj = powers[pIdx];
         let advIndices = (build.adv[pid] || []).map(aName => pObj.adv.findIndex(a => a.name === aName)).filter(i => i !== -1);
-        return `${pIdx}:${advIndices.join(',')}`;
+        let pStr = toB36(pIdx);
+        if (advIndices.length > 0) pStr += "_" + advIndices.map(toB36).join('_');
+        return pStr;
     });
-    let powerString = pParts.join('|');
+    let powerString = pParts.join('.');
     
-    // Specs map
     let getTreeIdx = (tid) => tid ? specializations.findIndex(t => t.id.toString() === tid.toString()) : "";
     let getMasteryIdx = (tid) => tid ? specializations.findIndex(t => t.mastery && t.mastery.id.toString() === tid.toString()) : "";
-    let tParams = [getTreeIdx(build.specs.primary), getTreeIdx(build.specs.sec1), getTreeIdx(build.specs.sec2), getMasteryIdx(build.specs.mastery)];
+    
+    let tParams = [getTreeIdx(build.specs.primary), getTreeIdx(build.specs.sec1), getTreeIdx(build.specs.sec2), getMasteryIdx(build.specs.mastery)].map(toB36);
     
     let allPerks = []; 
     specializations.forEach(t => allPerks = allPerks.concat(t.perks));
     let pParams = Object.keys(build.specs.points).map(k => {
         let pIdx = allPerks.findIndex(p => p.id === k);
-        return pIdx !== -1 ? `${pIdx}:${build.specs.points[k]}` : null;
+        return pIdx !== -1 ? `${toB36(pIdx)}_${toB36(build.specs.points[k])}` : null;
     }).filter(x => x !== null);
-    let specString = tParams.join('|') + "#" + pParams.join('|');
+    let specString = tParams.join('.') + "~" + pParams.join('.');
 
-    // Stats map
     let getStatIdx = (s) => s ? STAT_TREES.indexOf(s) : "";
-    let statString = [getStatIdx(build.stats.primary), getStatIdx(build.stats.sec1), getStatIdx(build.stats.sec2)].join('|');
+    let statString = [getStatIdx(build.stats.primary), getStatIdx(build.stats.sec1), getStatIdx(build.stats.sec2)].map(toB36).join('.');
     
-    // Devices map
-    let dParams = build.devices.map(d => d !== null ? devices.findIndex(x => x.id === d) : "").join(',');
+    let dParams = build.devices.map(d => d !== null ? toB36(devices.findIndex(x => x.id === d)) : "").join('.');
     
-    // CAMS map
     let cPolarity = build.cams && build.cams.polarity === 'Green' ? 1 : 0;
     let cLevel = build.cams ? build.cams.level : 0;
-    let cParams = `${cPolarity},${cLevel}`;
+    let cParams = `${toB36(cPolarity)}.${toB36(cLevel)}`;
     
-    // Variants map
-    let vParams = build.variants.map(v => v !== null ? powerVariants.findIndex(x => x.id === v) : "").join(',');
+    let vParams = build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.');
 
-    const finalCode = btoa(`${setIdx}*${powerString}*${specString}*${statString}*${dParams}*${cParams}*${vParams}`);
+    // Final code completely drops base64 'btoa'
+    const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
     
-    const currentUrl = window.location.origin + window.location.pathname;
-    const fullExportLink = `${currentUrl}?build=${encodeURIComponent(finalCode)}`;
+    // Automatically grabs the current domain and path
+    const currentUrl = window.location.origin + window.location.pathname; 
+    const fullExportLink = `${currentUrl}?b=${finalCode}`;
     
     const exportInput = document.getElementById('export-link');
     exportInput.value = fullExportLink;
@@ -1296,7 +1296,7 @@ function exportCode() {
     });
 }
 
-// --- NEW HYBRID IMPORT ENGINE ---
+// --- HYBRID UNIVERSAL IMPORT ENGINE ---
 function importCode(providedCode = null) {
     let inputStr = providedCode;
     
@@ -1310,6 +1310,7 @@ function importCode(providedCode = null) {
     if (!inputStr) return;
 
     if (inputStr.includes("http") && (inputStr.includes("v=") || inputStr.includes("d="))) {
+        // --- AESICA LEGACY TRANSLATOR ---
         if (typeof window.AesicaTranslator === 'undefined') {
             return typeof showMessage === "function" ? showMessage("Translator module missing!", "error") : alert("Translator missing!");
         }
@@ -1397,219 +1398,322 @@ function importCode(providedCode = null) {
             if(typeof showMessage === "function") showMessage("Could not map any powers to your database.", "error");
         }
         return;
-    }
-
-    try {
-        let raw = atob(inputStr);
-        let blocks = raw.includes('*') ? raw.split('*') : [raw.split('|').shift(), raw.split('|').slice(1).join('|'), "|||#", "||", "", "", ""];
         
-        // Detect if this is the Old format (text string like "force") or New format (number index like "0")
-        let isLiteFormat = !isNaN(parseInt(blocks[0])) && !isNaN(blocks[0] - 0);
+    } else if (inputStr.includes('-') && !inputStr.includes('http')) {
+        // --- NEW V3 BASE36 FORMAT ---
+        let blocks = inputStr.split('-');
+        let fromB36 = (str) => (str === "" || str === undefined) ? null : parseInt(str, 36);
 
-        if (isLiteFormat) {
-            // --- NEW LITE COMPRESSION LOADER ---
-            let setIdx = parseInt(blocks[0]);
-            let loadedSet = powersets[setIdx] ? powersets[setIdx].id : null;
-            if(!loadedSet) return showMessage("Invalid build code.", "error");
+        let setIdx = fromB36(blocks[0]);
+        let loadedSet = (setIdx !== null && powersets[setIdx]) ? powersets[setIdx].id : null;
+        if(!loadedSet) return showMessage("Invalid build code.", "error");
 
-            let newBuild = { 
-                set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
-                powers: new Array(14).fill(null), adv: {},
-                specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
-                devices: new Array(5).fill(null), variants: new Array(5).fill(null),
-                cams: { polarity: 'Blue', level: 0 }
-            };
+        let newBuild = { 
+            set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
+            powers: new Array(14).fill(null), adv: {},
+            specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
+            devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+            cams: { polarity: 'Blue', level: 0 }
+        };
 
-            // Powers
-            if (blocks[1]) {
-                let pwrSections = blocks[1].split('|');
-                for(let i = 0; i < 14 && i < pwrSections.length; i++) {
-                    if(pwrSections[i] === "") continue;
-                    let [pIdxStr, advString] = pwrSections[i].split(':');
-                    let pIdx = parseInt(pIdxStr);
-                    if (!isNaN(pIdx) && powers[pIdx]) {
-                        let pId = powers[pIdx].id;
-                        newBuild.powers[i] = pId;
-                        newBuild.adv[pId] = [];
-                        if (advString) {
-                            advString.split(',').forEach(aIdxStr => {
-                                let aIdx = parseInt(aIdxStr);
-                                if (!isNaN(aIdx) && powers[pIdx].adv && powers[pIdx].adv[aIdx]) {
-                                    newBuild.adv[pId].push(powers[pIdx].adv[aIdx].name);
-                                }
-                            });
+        if (blocks[1]) {
+            let pwrSections = blocks[1].split('.');
+            for(let i = 0; i < 14 && i < pwrSections.length; i++) {
+                if(pwrSections[i] === "") continue;
+                let parts = pwrSections[i].split('_'); 
+                let pIdx = fromB36(parts[0]);
+                if (pIdx !== null && powers[pIdx]) {
+                    let pId = powers[pIdx].id;
+                    newBuild.powers[i] = pId;
+                    newBuild.adv[pId] = [];
+                    for(let j = 1; j < parts.length; j++) {
+                        let aIdx = fromB36(parts[j]);
+                        if (aIdx !== null && powers[pIdx].adv && powers[pIdx].adv[aIdx]) {
+                            newBuild.adv[pId].push(powers[pIdx].adv[aIdx].name);
                         }
                     }
                 }
-            }
-
-            // Specs
-            if (blocks[2]) {
-                let specHalves = blocks[2].split('#');
-                if(specHalves[0]) {
-                    let tData = specHalves[0].split('|');
-                    let getTree = (idx) => (idx !== "" && specializations[parseInt(idx)]) ? specializations[parseInt(idx)].id : null;
-                    newBuild.specs.primary = getTree(tData[0]);
-                    newBuild.specs.sec1 = getTree(tData[1]);
-                    newBuild.specs.sec2 = getTree(tData[2]);
-                    
-                    let masterTreeIdx = tData[3];
-                    if(masterTreeIdx !== "" && specializations[parseInt(masterTreeIdx)] && specializations[parseInt(masterTreeIdx)].mastery) {
-                        newBuild.specs.mastery = specializations[parseInt(masterTreeIdx)].mastery.id;
-                    }
-                }
-                if(specHalves[1]) {
-                    let allPerks = []; specializations.forEach(t => allPerks = allPerks.concat(t.perks));
-                    let pData = specHalves[1].split('|');
-                    pData.forEach(pChunk => {
-                        let [pIdxStr, pts] = pChunk.split(':');
-                        if(pIdxStr && pts) {
-                            let pIdx = parseInt(pIdxStr);
-                            if(allPerks[pIdx]) newBuild.specs.points[allPerks[pIdx].id] = Number(pts);
-                        }
-                    });
-                }
-            }
-
-            // Stats
-            if (blocks[3]) {
-                let sData = blocks[3].split('|');
-                let getStat = (idx) => (idx !== "" && STAT_TREES[parseInt(idx)]) ? STAT_TREES[parseInt(idx)] : null;
-                newBuild.stats.primary = getStat(sData[0]);
-                newBuild.stats.sec1 = getStat(sData[1]);
-                newBuild.stats.sec2 = getStat(sData[2]);
-            }
-
-            // Devices
-            if (blocks[4]) {
-                let dData = blocks[4].split(',');
-                for(let i=0; i<5 && i<dData.length; i++) {
-                    if(dData[i] !== "") {
-                        let dIdx = parseInt(dData[i]);
-                        if(!isNaN(dIdx) && devices[dIdx]) newBuild.devices[i] = devices[dIdx].id;
-                    }
-                }
-            }
-
-            // CAMS
-            if (blocks[5]) {
-                let cData = blocks[5].split(',');
-                if(cData[0] !== "" && cData[1] !== undefined) {
-                    newBuild.cams = { polarity: cData[0] == "1" ? 'Green' : 'Blue', level: parseInt(cData[1]) };
-                }
-            }
-
-            // Variants
-            if (blocks[6]) {
-                let vData = blocks[6].split(',');
-                for(let i=0; i<5 && i<vData.length; i++) {
-                    if(vData[i] !== "") {
-                        let vIdx = parseInt(vData[i]);
-                        if(!isNaN(vIdx) && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
-                    }
-                }
-            }
-            
-            if (newBuild.powers.some(p => p !== null)) {
-                build = newBuild;
-                if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
-                expandedPowerId = null; 
-                let nextEmpty = build.powers.indexOf(null);
-                activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
-                if(typeof render === "function") render(); 
-                if(typeof showMessage === "function") showMessage("Build loaded successfully!", "success"); 
-            } else {
-                if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
-            }
-            
-        } else {
-            // --- OLD LEGACY LOADER ---
-            const loadedSet = blocks[0];
-            let newBuild = { 
-                set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
-                powers: new Array(14).fill(null), adv: {},
-                specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
-                devices: new Array(5).fill(null), variants: new Array(5).fill(null),
-                cams: { polarity: 'Blue', level: 0 }
-            };
-            
-            let index = 0;
-            let pwrSections = blocks[1] ? blocks[1].split('|') : [];
-            pwrSections.forEach(sec => {
-                let [pid, advString] = sec.split(':');
-                if (powers.find(p => p.id === pid)) {
-                    newBuild.powers[index] = pid;
-                    newBuild.adv[pid] = advString ? advString.split(',') : [];
-                    index++;
-                }
-            });
-
-            if(blocks[2]) {
-                let specHalves = blocks[2].split('#');
-                let tData = specHalves[0].split('|');
-                if(tData[0]) newBuild.specs.primary = tData[0];
-                if(tData[1]) newBuild.specs.sec1 = tData[1];
-                if(tData[2]) newBuild.specs.sec2 = tData[2];
-                if(tData[3]) newBuild.specs.mastery = tData[3];
-
-                if(specHalves[1]) {
-                    let pData = specHalves[1].split('|');
-                    pData.forEach(pChunk => {
-                        let [pid, pts] = pChunk.split(':');
-                        if(pid && pts) newBuild.specs.points[pid] = Number(pts);
-                    });
-                }
-            }
-
-            if(blocks[3]) {
-                let sData = blocks[3].split('|');
-                if(sData[0]) newBuild.stats.primary = sData[0];
-                if(sData[1]) newBuild.stats.sec1 = sData[1];
-                if(sData[2]) newBuild.stats.sec2 = sData[2];
-            }
-
-            if(blocks[4]) {
-                let dData = blocks[4].split(',');
-                for(let i=0; i<5 && i<dData.length; i++) {
-                    if(dData[i] && dData[i] !== "") newBuild.devices[i] = parseInt(dData[i]);
-                }
-            }
-            
-            if(blocks[5]) {
-                let cData = blocks[5].split(',');
-                if(cData[0] && cData[1] !== undefined) {
-                    newBuild.cams = { polarity: cData[0], level: parseInt(cData[1]) };
-                }
-            }
-            
-            if(blocks[6]) {
-                let vData = blocks[6].split(',');
-                for(let i=0; i<5 && i<vData.length; i++) {
-                    if(vData[i] && vData[i] !== "") newBuild.variants[i] = vData[i];
-                }
-            }
-            
-            if (newBuild.powers.some(p => p !== null)) {
-                build = newBuild;
-                if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
-                expandedPowerId = null; 
-                let nextEmpty = build.powers.indexOf(null);
-                activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
-                if(typeof render === "function") render(); 
-                if(typeof showMessage === "function") showMessage("Legacy build loaded successfully!", "success"); 
-            } else {
-                if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
             }
         }
-    } catch (e) { 
-        if(typeof showMessage === "function") showMessage("Failed to read code.", "error"); 
+
+        if (blocks[2]) {
+            let specHalves = blocks[2].split('~');
+            if (specHalves[0]) {
+                let tData = specHalves[0].split('.');
+                let getTree = (idx) => (idx !== null && specializations[idx]) ? specializations[idx].id : null;
+                newBuild.specs.primary = getTree(fromB36(tData[0]));
+                newBuild.specs.sec1 = getTree(fromB36(tData[1]));
+                newBuild.specs.sec2 = getTree(fromB36(tData[2]));
+                
+                let masterIdx = fromB36(tData[3]);
+                if (masterIdx !== null && specializations[masterIdx] && specializations[masterIdx].mastery) {
+                    newBuild.specs.mastery = specializations[masterIdx].mastery.id;
+                }
+            }
+            if (specHalves[1]) {
+                let allPerks = []; specializations.forEach(t => allPerks = allPerks.concat(t.perks));
+                let pData = specHalves[1].split('.');
+                pData.forEach(pChunk => {
+                    if(!pChunk) return;
+                    let [pIdxStr, ptsStr] = pChunk.split('_');
+                    let pIdx = fromB36(pIdxStr);
+                    let pts = fromB36(ptsStr);
+                    if (pIdx !== null && pts !== null && allPerks[pIdx]) {
+                        newBuild.specs.points[allPerks[pIdx].id] = pts;
+                    }
+                });
+            }
+        }
+
+        if (blocks[3]) {
+            let sData = blocks[3].split('.');
+            let getStat = (idx) => (idx !== null && STAT_TREES[idx]) ? STAT_TREES[idx] : null;
+            newBuild.stats.primary = getStat(fromB36(sData[0]));
+            newBuild.stats.sec1 = getStat(fromB36(sData[1]));
+            newBuild.stats.sec2 = getStat(fromB36(sData[2]));
+        }
+
+        if (blocks[4]) {
+            let dData = blocks[4].split('.');
+            for(let i=0; i<5 && i<dData.length; i++) {
+                let dIdx = fromB36(dData[i]);
+                if(dIdx !== null && devices[dIdx]) newBuild.devices[i] = devices[dIdx].id;
+            }
+        }
+
+        if (blocks[5]) {
+            let cData = blocks[5].split('.');
+            let cPol = fromB36(cData[0]);
+            let cLev = fromB36(cData[1]);
+            if (cPol !== null && cLev !== null) {
+                newBuild.cams = { polarity: cPol === 1 ? 'Green' : 'Blue', level: cLev };
+            }
+        }
+
+        if (blocks[6]) {
+            let vData = blocks[6].split('.');
+            for(let i=0; i<5 && i<vData.length; i++) {
+                let vIdx = fromB36(vData[i]);
+                if(vIdx !== null && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
+            }
+        }
+        
+        if (newBuild.powers.some(p => p !== null)) {
+            build = newBuild;
+            if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
+            expandedPowerId = null; 
+            let nextEmpty = build.powers.indexOf(null);
+            activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
+            if(typeof render === "function") render(); 
+            if(typeof showMessage === "function") showMessage("Build loaded successfully!", "success"); 
+        } else {
+            if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+        }
+    } else {
+        // --- V2/V1 BASE64 LEGACY FORMATS ---
+        try {
+            let raw = atob(inputStr);
+            let blocks = raw.includes('*') ? raw.split('*') : [raw.split('|').shift(), raw.split('|').slice(1).join('|'), "|||#", "||", "", "", ""];
+            let isLiteFormat = !isNaN(parseInt(blocks[0])) && !isNaN(blocks[0] - 0);
+
+            if (isLiteFormat) {
+                let setIdx = parseInt(blocks[0]);
+                let loadedSet = powersets[setIdx] ? powersets[setIdx].id : null;
+                if(!loadedSet) return showMessage("Invalid build code.", "error");
+
+                let newBuild = { 
+                    set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
+                    powers: new Array(14).fill(null), adv: {},
+                    specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
+                    devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+                    cams: { polarity: 'Blue', level: 0 }
+                };
+
+                if (blocks[1]) {
+                    let pwrSections = blocks[1].split('|');
+                    for(let i = 0; i < 14 && i < pwrSections.length; i++) {
+                        if(pwrSections[i] === "") continue;
+                        let [pIdxStr, advString] = pwrSections[i].split(':');
+                        let pIdx = parseInt(pIdxStr);
+                        if (!isNaN(pIdx) && powers[pIdx]) {
+                            let pId = powers[pIdx].id;
+                            newBuild.powers[i] = pId;
+                            newBuild.adv[pId] = [];
+                            if (advString) {
+                                advString.split(',').forEach(aIdxStr => {
+                                    let aIdx = parseInt(aIdxStr);
+                                    if (!isNaN(aIdx) && powers[pIdx].adv && powers[pIdx].adv[aIdx]) {
+                                        newBuild.adv[pId].push(powers[pIdx].adv[aIdx].name);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (blocks[2]) {
+                    let specHalves = blocks[2].split('#');
+                    if(specHalves[0]) {
+                        let tData = specHalves[0].split('|');
+                        let getTree = (idx) => (idx !== "" && specializations[parseInt(idx)]) ? specializations[parseInt(idx)].id : null;
+                        newBuild.specs.primary = getTree(tData[0]);
+                        newBuild.specs.sec1 = getTree(tData[1]);
+                        newBuild.specs.sec2 = getTree(tData[2]);
+                        
+                        let masterTreeIdx = tData[3];
+                        if(masterTreeIdx !== "" && specializations[parseInt(masterTreeIdx)] && specializations[parseInt(masterTreeIdx)].mastery) {
+                            newBuild.specs.mastery = specializations[parseInt(masterTreeIdx)].mastery.id;
+                        }
+                    }
+                    if(specHalves[1]) {
+                        let allPerks = []; specializations.forEach(t => allPerks = allPerks.concat(t.perks));
+                        let pData = specHalves[1].split('|');
+                        pData.forEach(pChunk => {
+                            let [pIdxStr, pts] = pChunk.split(':');
+                            if(pIdxStr && pts) {
+                                let pIdx = parseInt(pIdxStr);
+                                if(allPerks[pIdx]) newBuild.specs.points[allPerks[pIdx].id] = Number(pts);
+                            }
+                        });
+                    }
+                }
+
+                if (blocks[3]) {
+                    let sData = blocks[3].split('|');
+                    let getStat = (idx) => (idx !== "" && STAT_TREES[parseInt(idx)]) ? STAT_TREES[parseInt(idx)] : null;
+                    newBuild.stats.primary = getStat(sData[0]);
+                    newBuild.stats.sec1 = getStat(sData[1]);
+                    newBuild.stats.sec2 = getStat(sData[2]);
+                }
+
+                if (blocks[4]) {
+                    let dData = blocks[4].split(',');
+                    for(let i=0; i<5 && i<dData.length; i++) {
+                        if(dData[i] !== "") {
+                            let dIdx = parseInt(dData[i]);
+                            if(!isNaN(dIdx) && devices[dIdx]) newBuild.devices[i] = devices[dIdx].id;
+                        }
+                    }
+                }
+
+                if (blocks[5]) {
+                    let cData = blocks[5].split(',');
+                    if(cData[0] !== "" && cData[1] !== undefined) {
+                        newBuild.cams = { polarity: cData[0] == "1" ? 'Green' : 'Blue', level: parseInt(cData[1]) };
+                    }
+                }
+
+                if (blocks[6]) {
+                    let vData = blocks[6].split(',');
+                    for(let i=0; i<5 && i<vData.length; i++) {
+                        if(vData[i] !== "") {
+                            let vIdx = parseInt(vData[i]);
+                            if(!isNaN(vIdx) && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
+                        }
+                    }
+                }
+                
+                if (newBuild.powers.some(p => p !== null)) {
+                    build = newBuild;
+                    if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
+                    expandedPowerId = null; 
+                    let nextEmpty = build.powers.indexOf(null);
+                    activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
+                    if(typeof render === "function") render(); 
+                    if(typeof showMessage === "function") showMessage("Build loaded successfully!", "success"); 
+                } else {
+                    if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+                }
+                
+            } else {
+                const loadedSet = blocks[0];
+                let newBuild = { 
+                    set: loadedSet, stats: { primary: null, sec1: null, sec2: null },
+                    powers: new Array(14).fill(null), adv: {},
+                    specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
+                    devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+                    cams: { polarity: 'Blue', level: 0 }
+                };
+                
+                let index = 0;
+                let pwrSections = blocks[1] ? blocks[1].split('|') : [];
+                pwrSections.forEach(sec => {
+                    let [pid, advString] = sec.split(':');
+                    if (powers.find(p => p.id === pid)) {
+                        newBuild.powers[index] = pid;
+                        newBuild.adv[pid] = advString ? advString.split(',') : [];
+                        index++;
+                    }
+                });
+
+                if(blocks[2]) {
+                    let specHalves = blocks[2].split('#');
+                    let tData = specHalves[0].split('|');
+                    if(tData[0]) newBuild.specs.primary = tData[0];
+                    if(tData[1]) newBuild.specs.sec1 = tData[1];
+                    if(tData[2]) newBuild.specs.sec2 = tData[2];
+                    if(tData[3]) newBuild.specs.mastery = tData[3];
+
+                    if(specHalves[1]) {
+                        let pData = specHalves[1].split('|');
+                        pData.forEach(pChunk => {
+                            let [pid, pts] = pChunk.split(':');
+                            if(pid && pts) newBuild.specs.points[pid] = Number(pts);
+                        });
+                    }
+                }
+
+                if(blocks[3]) {
+                    let sData = blocks[3].split('|');
+                    if(sData[0]) newBuild.stats.primary = sData[0];
+                    if(sData[1]) newBuild.stats.sec1 = sData[1];
+                    if(sData[2]) newBuild.stats.sec2 = sData[2];
+                }
+
+                if(blocks[4]) {
+                    let dData = blocks[4].split(',');
+                    for(let i=0; i<5 && i<dData.length; i++) {
+                        if(dData[i] && dData[i] !== "") newBuild.devices[i] = parseInt(dData[i]);
+                    }
+                }
+                
+                if(blocks[5]) {
+                    let cData = blocks[5].split(',');
+                    if(cData[0] && cData[1] !== undefined) {
+                        newBuild.cams = { polarity: cData[0], level: parseInt(cData[1]) };
+                    }
+                }
+                
+                if(blocks[6]) {
+                    let vData = blocks[6].split(',');
+                    for(let i=0; i<5 && i<vData.length; i++) {
+                        if(vData[i] && vData[i] !== "") newBuild.variants[i] = vData[i];
+                    }
+                }
+                
+                if (newBuild.powers.some(p => p !== null)) {
+                    build = newBuild;
+                    if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
+                    expandedPowerId = null; 
+                    let nextEmpty = build.powers.indexOf(null);
+                    activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
+                    if(typeof render === "function") render(); 
+                    if(typeof showMessage === "function") showMessage("Legacy build loaded successfully!", "success"); 
+                } else {
+                    if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
+                }
+            }
+        } catch (e) { 
+            if(typeof showMessage === "function") showMessage("Failed to read code.", "error"); 
+        }
     }
 }
 
 // --- AUTO-LOAD BUILD FROM URL ---
+// Updated to check for both the old 'build' parameter and the new 'b' parameter
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const incomingBuildCode = urlParams.get('build');
+    const incomingBuildCode = urlParams.get('b') || urlParams.get('build');
     
     if (incomingBuildCode) {
         setTimeout(() => {

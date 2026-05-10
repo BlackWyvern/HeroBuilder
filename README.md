@@ -56,6 +56,11 @@ Sofist  - Tester
 Mewblox - Tester
 
 
+============ DISCLAIMER =============
+
+This software was coded with the help of Google Gemini Pro AI. 
+AI is not perfect, this project was simply made for fun over the span of a few days.
+Please report all bugs, typos, old information, missing information and any other relevant issues to me via discord or github.
 
 
 

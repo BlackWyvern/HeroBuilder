@@ -8,7 +8,7 @@ function applySmartZoom() {
     const widthRatio = currentWidth / targetWidth;
     const heightRatio = currentHeight / targetHeight;
     let finalZoom = Math.min(widthRatio, heightRatio);
-    finalZoom = Math.min(finalZoom, 0.75); // User scale preference maintained
+    finalZoom = Math.min(finalZoom, 1.0); // User scale preference maintained
     document.body.style.zoom = finalZoom;
 }
 applySmartZoom();
@@ -1284,9 +1284,10 @@ function exportCode() {
     // Final code completely drops base64 'btoa'
     const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
     
-    // Automatically grabs the current domain and path
+    // --- THIS IS THE FIX: IT AUTOMATICALLY DETECTS YOUR ACTUAL DOMAIN ---
     const currentUrl = window.location.origin + window.location.pathname; 
     const fullExportLink = `${currentUrl}?b=${finalCode}`;
+    // ------------------------------------------------------------------
     
     const exportInput = document.getElementById('export-link');
     exportInput.value = fullExportLink;

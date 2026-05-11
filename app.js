@@ -1310,6 +1310,14 @@ function importCode(providedCode = null) {
 
     if (!inputStr) return;
 
+    // --- THE FIX: Strip URL wrappers if a full link is pasted locally ---
+    if (inputStr.includes('?b=')) {
+        inputStr = inputStr.split('?b=')[1].split('&')[0];
+    } else if (inputStr.includes('?build=')) {
+        inputStr = inputStr.split('?build=')[1].split('&')[0];
+    }
+    // --------------------------------------------------------------------
+
     if (inputStr.includes("http") && (inputStr.includes("v=") || inputStr.includes("d="))) {
         // --- AESICA LEGACY TRANSLATOR ---
         if (typeof window.AesicaTranslator === 'undefined') {

@@ -1,5 +1,5 @@
 /* ==============================================================================
- * custom-additions.js (SAFE NON-DESTRUCTIVE OVERLAY)
+ * custom-additions.js (GHOST POINTS FIXED)
  * ============================================================================== */
 
 const CustomContent = {
@@ -184,7 +184,7 @@ rawTravelPowers.forEach((tp, index) => {
 });
 
 // ==============================================================================
-// THE INJECTOR ENGINE (SAFE PUSH TO LEGACY ARRAYS)
+// THE INJECTOR ENGINE (SAFE IN-PLACE SEAT PRESERVATION)
 // ==============================================================================
 function injectCustomContent() {
     if (typeof powers !== 'undefined') {
@@ -194,7 +194,7 @@ function injectCustomContent() {
                 if (!customPower.adv.some(a => a.name === "Rank 2")) customPower.adv.unshift({ name: "Rank 2", cost: 2 });
                 if (!customPower.adv.some(a => a.name === "Rank 3")) customPower.adv.splice(1, 0, { name: "Rank 3", cost: 2 });
             }
-            powers.push(customPower);
+            powers.push(customPower); // Safe: Push to bottom of the array
 
             if (typeof HCData !== 'undefined' && HCData.power) {
                 let nativeAdvList = [{ id: 0, name: null, points: null, dependency: null, toolTip: null }];
@@ -244,8 +244,7 @@ function injectCustomContent() {
         });
     }
     
-    // ⚡ 4. MASSIVE PERK HOTFIX
-    const perksToRemove = { "Ego": ["Mind over Matter"], "Avenger": ["Round 'em Up"], "Commander": ["Create An Opening"], "Arbiter": ["Arbiter Aura"], "Overseer": ["Overseer Aura"] };
+    // ⚡ 4. MASSIVE PERK HOTFIX (IN-PLACE SEAT PRESERVATION)
     const specUpdates = {
         "Strength": { "Swole": { maxPoints: 3 }, "Physical Peak": { desc: "Your Secondary Super Stats now grant a Cost Discount to your Melee powers.", maxPoints: 3 }, "Juggernaut": { maxPoints: 3 }, "Overpower": { maxPoints: 3 }, "Quick Recovery": { desc: "Your Recovery increases your Health Regeneration. This effect only triggers while in combat.", maxPoints: 2 }, "Aggression": { desc: "Increases the amount of Offense you receive from items by 10/20%.", maxPoints: 2 }, "Balance": { desc: "Your Strength now grants Knock bonuses to your Ranged Knock powers, equal to 25% of the bonus it grants your Melee powers. However, this Specialization causes your Ego to no longer affect the Knock strength of your Ranged powers.", maxPoints: 2 }, "Brutality": { maxPoints: 2 }, "Strength Mastery": { desc: "You gain 20 Strength and 30 Offense." } },
         "Dexterity": { "Combat Training": { desc: "Offense now grants Critical Strike Rating.", maxPoints: 3 }, "Gear Utilization": { maxPoints: 3 }, "Deadly Aim": { maxPoints: 3 }, "Quick Reflexes": { maxPoints: 3 }, "Brush It Off": { maxPoints: 2 }, "Power Swell": { maxPoints: 2 }, "Evasion": { maxPoints: 2 }, "Expose Weakness": { desc: "Whenever you Critically Strike a foe, you reduce their Resistance to your attacks by 1/2% for 10 seconds. This effect stacks up to 5 times.", maxPoints: 2 }, "Dexterity Mastery": { desc: "You gain 20 Dexterity and 10 Critical Severity and Avoidance Rating." } },
@@ -268,24 +267,39 @@ function injectCustomContent() {
         "Vindicator": { "Merciless": { desc: "Increases your Critical Severity by 5/10/15%", maxPoints: 3 }, "The Rush of Battle": { desc: "When you defeat an enemy, you regain 5/10/15% of your Max Health over the next 5 sec.", maxPoints: 3 }, "Focused Strikes": { maxPoints: 3 }, "Mass Destruction": { maxPoints: 3 }, "Aggressive Stance": { desc: "You gain 10/20% of your Offense from gear as Defense.<br /><br />Additionally, you gain 10/20% of your Offense from individual powers as Defense.", maxPoints: 2 }, "Initiative": { desc: "Your Energy Builder attacks now reduce the resistance of affected targets by 2/4% for 12 sec.", maxPoints: 2 }, "Modified Gear": { maxPoints: 2 }, "Offensive Expertise": { maxPoints: 2 }, "Vindicator Mastery": {} }
     };
 
-    const newPerks = [
-        { tree: "Ego", name: "Mind Over Matter", tier: 2, maxPoints: 2, desc: "Your Ego now grants Knock bonuses to your Melee Knock powers, equal to 25/50% the bonus it grants your Ranged powers. However, this Specialization causes your Strength to no longer affect the Knock strength of your Melee powers." },
-        { tree: "Avenger", name: "Round 'Em Up", tier: 1, maxPoints: 3, desc: "Your AoE attacks cause your targets to take 1/2/3% more damage from further AoE attacks you make. Stacks up to 3 times and lasts 10s." },
-        { tree: "Commander", name: "Create an Opening", tier: 1, maxPoints: 2, desc: "Whenever you Critically Strike, your pets Critical Chance is increased by 10/20% for 5 sec." },
-        { tree: "Arbiter", name: "Enhanced Mending", tier: 1, maxPoints: 2, desc: "Directly damaging a foe with a non energy builder Melee attack increases the duration of your active Rune powers by 1/2 sec. The duration cannot exceed the normal duration of the power." },
-        { tree: "Overseer", name: "Enhanced Mending", tier: 1, maxPoints: 2, desc: "Directly damaging a foe with a non energy builder Ranged attack increases the duration of your active Rune powers by 1/2 sec. The duration cannot exceed the normal duration of the power." }
-    ];
+    // The Safe Replacement Map (Overrides properties IN-PLACE so no items are deleted)
+    const perkOverhauls = {
+        "Ego": { "Mind over Matter": { name: "Mind Over Matter", tier: 2, maxPoints: 2, desc: "Your Ego now grants Knock bonuses to your Melee Knock powers, equal to 25/50% the bonus it grants your Ranged powers. However, this Specialization causes your Strength to no longer affect the Knock strength of your Melee powers." } },
+        "Avenger": { "Round 'em Up": { name: "Round 'Em Up", tier: 1, maxPoints: 3, desc: "Your AoE attacks cause your targets to take 1/2/3% more damage from further AoE attacks you make. Stacks up to 3 times and lasts 10s." } },
+        "Commander": { "Create An Opening": { name: "Create an Opening", tier: 1, maxPoints: 2, desc: "Whenever you Critically Strike, your pets Critical Chance is increased by 10/20% for 5 sec." } },
+        "Arbiter": { "Arbiter Aura": { name: "Enhanced Mending", tier: 1, maxPoints: 2, desc: "Directly damaging a foe with a non energy builder Melee attack increases the duration of your active Rune powers by 1/2 sec. The duration cannot exceed the normal duration of the power." } },
+        "Overseer": { "Overseer Aura": { name: "Enhanced Mending", tier: 1, maxPoints: 2, desc: "Directly damaging a foe with a non energy builder Ranged attack increases the duration of your active Rune powers by 1/2 sec. The duration cannot exceed the normal duration of the power." } }
+    };
 
     if (typeof HCData !== 'undefined' && HCData.specializationTree) {
         HCData.specializationTree.forEach(tree => {
             if (specUpdates[tree.name]) {
                 tree.specializationList.forEach(perk => {
                     let update = specUpdates[tree.name][perk.name];
-                    if (update) { if (update.desc) perk.tip = update.desc; if (update.maxPoints !== undefined) perk.maxRank = update.maxPoints; if (update.tier !== undefined) perk.tier = update.tier; }
+                    if (update) { 
+                        if (update.desc) perk.tip = update.desc; 
+                        if (update.maxPoints !== undefined) perk.maxRank = update.maxPoints; 
+                        if (update.tier !== undefined) perk.tier = update.tier; 
+                    }
                 });
             }
-            if (perksToRemove[tree.name]) { tree.specializationList = tree.specializationList.filter(p => !perksToRemove[tree.name].includes(p.name)); }
-            newPerks.forEach(newP => { if (newP.tree === tree.name) { if (!tree.specializationList.some(p => p.name === newP.name)) { tree.specializationList.push({ name: newP.name, tip: newP.desc, maxRank: newP.maxPoints, tier: newP.tier }); } } });
+            // Safely overwrite target perks WITHOUT shrinking the array
+            if (perkOverhauls[tree.name]) {
+                tree.specializationList.forEach(perk => {
+                    let overhaul = perkOverhauls[tree.name][perk.name];
+                    if (overhaul) {
+                        perk.name = overhaul.name;
+                        perk.tip = overhaul.desc;
+                        perk.maxRank = overhaul.maxPoints;
+                        perk.tier = overhaul.tier;
+                    }
+                });
+            }
         });
     }
 
@@ -294,21 +308,33 @@ function injectCustomContent() {
             if (specUpdates[tree.name]) {
                 tree.perks.forEach(perk => {
                     let update = specUpdates[tree.name][perk.name];
-                    if (update) { if (update.desc) perk.desc = update.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>'); if (update.maxPoints !== undefined) perk.maxPoints = update.maxPoints; if (update.tier !== undefined) perk.tier = update.tier; }
+                    if (update) { 
+                        if (update.desc) perk.desc = update.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>'); 
+                        if (update.maxPoints !== undefined) perk.maxPoints = update.maxPoints; 
+                        if (update.tier !== undefined) perk.tier = update.tier; 
+                    }
                 });
                 if (tree.mastery) {
                     let mUpdate = specUpdates[tree.name][tree.mastery.name];
-                    if (mUpdate) { if (mUpdate.desc) tree.mastery.desc = mUpdate.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>'); if (mUpdate.maxPoints !== undefined) tree.mastery.maxPoints = mUpdate.maxPoints; if (mUpdate.tier !== undefined) tree.mastery.tier = mUpdate.tier; }
-                }
-            }
-            if (perksToRemove[tree.name]) { tree.perks = tree.perks.filter(p => !perksToRemove[tree.name].includes(p.name)); }
-            newPerks.forEach((newP, index) => {
-                if (newP.tree === tree.name) {
-                    if (!tree.perks.some(p => p.name === newP.name)) {
-                        tree.perks.push({ id: "spec_" + tree.name.toLowerCase() + "_new_" + index, name: newP.name, desc: newP.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>'), maxPoints: newP.maxPoints, tier: newP.tier, spriteX: 58, spriteY: 350, width: 24, height: 32, renderScale: 1.0, image: "spritesheet.png" });
+                    if (mUpdate) { 
+                        if (mUpdate.desc) tree.mastery.desc = mUpdate.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>'); 
+                        if (mUpdate.maxPoints !== undefined) tree.mastery.maxPoints = mUpdate.maxPoints; 
+                        if (mUpdate.tier !== undefined) tree.mastery.tier = mUpdate.tier; 
                     }
                 }
-            });
+            }
+            // Safely overwrite target perks WITHOUT shrinking the array
+            if (perkOverhauls[tree.name]) {
+                tree.perks.forEach(perk => {
+                    let overhaul = perkOverhauls[tree.name][perk.name];
+                    if (overhaul) {
+                        perk.name = overhaul.name;
+                        perk.desc = overhaul.desc.replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+                        perk.maxPoints = overhaul.maxPoints;
+                        perk.tier = overhaul.tier;
+                    }
+                });
+            }
         });
     }
 }
@@ -374,17 +400,15 @@ window.syncTravelUI = function() {
     }
 };
 
-// Check the address bar immediately when the script runs
 window.parseTravelString(window.location.href);
 
-// Watch for manual imports (when someone pastes a link into the input box)
 document.addEventListener('input', (e) => {
     if ((e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') && e.target.value.includes('&travel=')) {
         window.parseTravelString(e.target.value);
     }
 });
 
-// --- IMPORT ENGINE HOOK (Intercepts auto-loader to save Travel Powers from being wiped) ---
+// --- IMPORT ENGINE HOOK (Intercepts auto-loader) ---
 let isInitialLoad = true;
 let importEngineHook = setInterval(() => {
     if (typeof window.importCode === 'function' && !window.importCode.isTravelHijacked) {
@@ -397,21 +421,18 @@ let importEngineHook = setInterval(() => {
                 if (importElement) inputStr = importElement.value.trim();
             }
 
-            // On the very first page load, app.js strips "&travel=" before calling importCode. 
-            // So we read from the raw window.location.href instead.
             if (isInitialLoad && window.location.href.includes('&travel=')) {
                 window.parseTravelString(window.location.href);
             } else if (inputStr && inputStr.includes('&travel=')) {
                 window.parseTravelString(inputStr);
             } else {
-                // Completely new build loaded without travel powers, so wipe them
                 window.customTravelState.t1 = {powerIndex: null, advBitmask: 0};
                 window.customTravelState.t2 = {powerIndex: null, advBitmask: 0};
                 window.syncTravelUI();
             }
             
             isInitialLoad = false;
-            origImport.apply(this, arguments); // Let legacy app load the rest
+            origImport.apply(this, arguments); 
         };
         window.importCode.isTravelHijacked = true;
     }
@@ -460,7 +481,6 @@ setTimeout(() => {
             </div>
         `;
         
-        // This drops the UI directly above the changing container so the app can't delete it
         specsHud.parentNode.insertBefore(wrapper, specsHud);
 
         let modal = document.createElement('div');
@@ -514,7 +534,6 @@ setTimeout(() => {
                 lbl.innerHTML = `<input type="checkbox" data-bit="${i}" ${isChecked ? 'checked' : ''} style="margin-right: 6px;"> ${a.name} (${a.cost} pts)`;
                 
                 lbl.querySelector('input').addEventListener('change', (e) => {
-                    // Check against app cap before applying
                     let baseAppPts = window.getTotalAdvantagePoints ? window.getTotalAdvantagePoints() : 0;
                     
                     if (e.target.checked) {
@@ -533,7 +552,6 @@ setTimeout(() => {
                         window.customTravelState[slot].advBitmask &= ~(1 << i);
                     }
                     
-                    // We artificially poke the app.js rendering sequence so the observer catches the math change
                     if (typeof window.render === 'function') window.render();
                 });
                 advsContainer.appendChild(lbl);
@@ -547,7 +565,7 @@ setTimeout(() => {
     }
 }, 500);
 
-// --- THE POINTS OBSERVER (FIXED REGEX) ---
+// --- THE POINTS OBSERVER (FIXED REGEX FILTER) ---
 const observer = new MutationObserver(() => {
     // 1. Sync manual text boxes
     document.querySelectorAll('input[type="text"], textarea').forEach(input => {
@@ -558,18 +576,19 @@ const observer = new MutationObserver(() => {
         }
     });
 
-    // 2. Sync the visual points counter!
+    // 2. Sync the visual points counter safely!
     let travelSpent = getTravelAdvPoints();
     
-    // We scan every generic div because app.js deletes and redraws them constantly
     document.querySelectorAll('div, span, p, b, strong').forEach(el => {
         if (el.children.length === 0) {
             let txt = el.textContent.trim();
-            // This new regex perfectly matches app.js output: exactly "X / Y" format
+            // Match the strict "X / Y" format
             let match = txt.match(/^(\d+)\s*\/\s*(\d+)$/);
             
-            if (match) {
-                // If it doesn't have our tag, it's a fresh render from the legacy app!
+            // THE CRITICAL FIX: Only grab the GLOBAL counters (which have a max limit of at least 36).
+            // This prevents the observer from accidentally giving points to the "0 / 3" perk boxes!
+            if (match && parseInt(match[2]) >= 36) {
+                
                 if (!el.hasAttribute('data-travel-pts')) {
                     el.setAttribute('data-base-pts', match[1]);
                     el.setAttribute('data-travel-pts', travelSpent);
@@ -577,11 +596,17 @@ const observer = new MutationObserver(() => {
                     let realTotal = parseInt(match[1]) + travelSpent;
                     el.textContent = `${realTotal} / ${match[2]}`;
                     
-                    // Turn it red if they hit the cap
-                    if (realTotal >= parseInt(match[2])) {
-                        el.style.color = '#ff5555';
+                    if (realTotal >= parseInt(match[2])) el.style.color = '#ff5555';
+                } else {
+                    let lastTravelPts = parseInt(el.getAttribute('data-travel-pts'));
+                    if (lastTravelPts !== travelSpent) {
+                        let basePts = parseInt(el.getAttribute('data-base-pts'));
+                        let realTotal = basePts + travelSpent;
+                        el.setAttribute('data-travel-pts', travelSpent);
+                        el.textContent = `${realTotal} / ${match[2]}`;
+                        el.style.color = (realTotal >= parseInt(match[2])) ? '#ff5555' : ''; // Reset to app default or red
                     }
-                } 
+                }
             }
         }
     });

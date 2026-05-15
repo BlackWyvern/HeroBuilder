@@ -52,6 +52,12 @@ if (!document.getElementById('hud-layout-overrides')) {
                 visibility: visible;
                 opacity: 1;
             }
+            
+            /* --- INVALID SLOT HIGHLIGHTING & DRAG STYLING --- */
+            .slot.invalid-slot { background: rgba(255,0,0,0.1) !important; border: 2px dashed #ff5555 !important; }
+            .slot.invalid-slot .slot-name { color: #ff5555 !important; }
+            .slot.invalid-slot .slot-tier { color: #ff5555 !important; font-weight: bold; opacity: 1 !important; }
+            .slot.drag-over { border-color: #4DA8DA !important; background: rgba(77, 168, 218, 0.2) !important; box-shadow: inset 0 0 10px rgba(77, 168, 218, 0.5); }
         </style>
     `);
 }
@@ -120,7 +126,7 @@ const powerVariants = [
     { id: "v_blade_bomb", name: "Blade Bomb" },
     { id: "v_blade_barrage", name: "Blade Barrage" },
     { id: "v_virulent_shot", name: "Virulent Shot" },
-    { id: "v_toxic_blades", name: "Toxic Blades" },
+    { id: "v_toxic_blades", name: "Venom Shock" },
     { id: "v_venom_shock", name: "Venom Shock" },
     { id: "v_blight_touch", name: "Blight Touch" },
     { id: "v_icefall", name: "Icefall" },
@@ -216,6 +222,8 @@ function getTotalAdvantagePoints() {
         let pObj = powers.find(p => p.id === pId);
         if (pObj && pObj.adv && pAdvs.length > 0) {
             pAdvs.forEach(aName => {
+                if (pObj.isEnergyUnlock && (aName === "Rank 2" || aName === "Rank 3")) return;
+                
                 let aObj = pObj.adv.find(a => a.name === aName);
                 if (aObj && !aObj.isHidden) total += aObj.cost;
             });
@@ -237,7 +245,8 @@ function checkUnlockForSlot(power, slotIndex, simulatedBuild) {
         if(id) {
             let p = powers.find(x => x.id === id);
             if(p) { 
-                if(p.tier !== "EB" && p.tier !== 0) nonEbTotal++; 
+                if(p.tier !== "EB") nonEbTotal++; 
+                
                 let pSets = [p.set];
                 if (p.sharedWith) pSets = pSets.concat(p.sharedWith);
                 if (pSets.some(s => powerSets.includes(s))) powerSetCount++;
@@ -249,20 +258,6 @@ function checkUnlockForSlot(power, slotIndex, simulatedBuild) {
     if (power.tier == 2) return powerSetCount >= 3 || nonEbTotal >= 4;
     if (power.tier == 3) return powerSetCount >= 5 || nonEbTotal >= 6;
     return false;
-}
-
-function validateFullBuild(simulatedBuild) {
-    let hasEB = false, hasUltimate = false;
-    for(let i = 0; i < MAX_POWERS; i++) {
-        let id = simulatedBuild[i];
-        if(id) {
-            let p = powers.find(x => x.id === id);
-            if(p.tier === "EB") { if(hasEB) return false; hasEB = true; }
-            if(p.tier == 4) { if(hasUltimate) return false; hasUltimate = true; }
-            if(!checkUnlockForSlot(p, i, simulatedBuild)) return false; 
-        }
-    }
-    return true;
 }
 
 // --- POWER UI INTERACTION ---
@@ -281,8 +276,6 @@ function removePowerFromSlot(index, e) {
     let simBuild = [...build.powers];
     simBuild.splice(index, 1);
     simBuild.push(null);
-
-    if(!validateFullBuild(simBuild)) return showMessage("Cannot remove: A later power relies on this slot to meet its Tier requirements!", "error");
 
     build.powers = simBuild;
     let nextEmpty = build.powers.indexOf(null);
@@ -316,6 +309,7 @@ function togglePower(id) {
 
     let isEB = (pwr.tier === "EB");
     
+    // Hard Limit: EBs must be in Slot 0
     if (isEB) {
         activeSlotIndex = 0; 
     } else {
@@ -338,11 +332,25 @@ function togglePower(id) {
     if (activeSlotIndex === 0 && !isEB) return showMessage("Only Energy Builders can be placed in the first slot.", "error");
     if (activeSlotIndex > 0 && isEB) return showMessage("Energy Builders can only be placed in the first slot.", "error");
 
+    if (!checkUnlockForSlot(pwr, activeSlotIndex, build.powers)) {
+        return showMessage("Tier prerequisites not met for this slot position.", "error");
+    }
+
     let simBuild = [...build.powers];
     let oldPower = simBuild[activeSlotIndex];
     simBuild[activeSlotIndex] = id;
 
-    if(!validateFullBuild(simBuild)) return showMessage("Cannot place power here. Tier requirements not met.", "error");
+    // Hard Limit: Only One Ultimate Allowed
+    if (pwr.tier == 4) {
+        let ultCount = simBuild.filter(pid => pid && powers.find(x => x.id === pid)?.tier == 4).length;
+        if (ultCount > 1) return showMessage("You can only have one Ultimate (Tier 4) power.", "error");
+    }
+    
+    // Hard Limit: Only One Energy Unlock Allowed
+    if (pwr.isEnergyUnlock) {
+        let unlockCount = simBuild.filter(pid => pid && powers.find(x => x.id === pid)?.isEnergyUnlock).length;
+        if (unlockCount > 1) return showMessage("You can only have one Energy Unlock power.", "error");
+    }
 
     if(oldPower && oldPower !== id) {
         delete build.adv[oldPower];
@@ -357,6 +365,62 @@ function togglePower(id) {
     activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
     render();
 }
+
+// --- DRAG AND DROP ENGINE ---
+let draggedSlotIndex = null;
+
+window.dragStart = function(e, index) {
+    if (index === 0 || build.powers[index] === null) {
+        e.preventDefault();
+        return; 
+    }
+    draggedSlotIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
+
+    // THE FIX: Provide a clean text-based ghost image to bypass the HTML5 Sprite clipping bug
+    let detailsNode = e.currentTarget.querySelector('.slot-details');
+    if (detailsNode) {
+        e.dataTransfer.setDragImage(detailsNode, 0, 10);
+    }
+};
+
+window.dragOver = function(e, index) {
+    if (index === 0) return; 
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+};
+
+window.dragLeave = function(e) {
+    e.currentTarget.classList.remove('drag-over');
+};
+
+window.dropSlot = function(e, targetIndex) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    
+    if (draggedSlotIndex === null || draggedSlotIndex === targetIndex || targetIndex === 0) {
+        draggedSlotIndex = null;
+        return;
+    }
+
+    // Safely Swap Powers, Variants, and Devices
+    let tempPower = build.powers[targetIndex];
+    build.powers[targetIndex] = build.powers[draggedSlotIndex];
+    build.powers[draggedSlotIndex] = tempPower;
+
+    let tempVar = build.variants[targetIndex];
+    build.variants[targetIndex] = build.variants[draggedSlotIndex];
+    build.variants[draggedSlotIndex] = tempVar;
+
+    let tempDev = build.devices[targetIndex];
+    build.devices[targetIndex] = build.devices[draggedSlotIndex];
+    build.devices[draggedSlotIndex] = tempDev;
+
+    draggedSlotIndex = null;
+    render();
+};
 
 // Update Advantage Logic
 window.toggleAdvantage = function(powerId, advName, cost) {
@@ -1091,29 +1155,51 @@ function render() {
         let activeClass = isActive ? 'active-slot' : '';
         let isSelectable = (i <= nextEmpty) ? 'selectable' : 'locked-slot';
 
-        let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+        let isInvalid = false;
+        let invalidMsg = "";
+
+        // Enable dragging for everything except Slot 0
+        let dragAttrs = i > 0 ? `draggable="true" ondragstart="dragStart(event, ${i})" ondragover="dragOver(event, ${i})" ondragleave="dragLeave(event)" ondrop="dropSlot(event, ${i})"` : ``;
 
         if (pId) {
             let p = powers.find(x => x.id === pId);
-            let activeAdvs = build.adv[pId] || [];
             
+            let ultCountBefore = 0;
+            for(let j = 0; j < i; j++) {
+                if(build.powers[j] && powers.find(x => x.id === build.powers[j])?.tier == 4) ultCountBefore++;
+            }
+            if (p.tier == 4 && ultCountBefore > 0) {
+                isInvalid = true;
+                invalidMsg = "Multiple Ultimates not allowed";
+            } else if (!checkUnlockForSlot(p, i, build.powers)) {
+                isInvalid = true;
+                invalidMsg = "Tier prerequisites not met";
+            }
+
+            let activeAdvs = build.adv[pId] || [];
             let visibleAdvs = activeAdvs.filter(aName => {
+                if (p.isEnergyUnlock && (aName === "Rank 2" || aName === "Rank 3")) return false;
+                
                 let aObj = p.adv ? p.adv.find(a => a.name === aName) : null;
                 return aObj && !aObj.isHidden;
             });
-            
             let advHtml = visibleAdvs.length > 0 ? `<div class="slot-advs" style="font-size: 13px; color: #bbb; margin-top: 4px;">${visibleAdvs.join(' &bull; ')}</div>` : '';
 
             let jumpBtnHtml = `<button class="jump-btn" style="position: absolute; left: -34px; top: 50%; transform: translateY(-50%); background: #ffeb3b; color: #000; border: 2px solid #222; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; z-index: 10; font-size: 16px; font-weight: bold; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.8);" onclick="jumpToPower('${pId}', event)" title="Locate in Library">&#9664;</button>`;
+            let tooltipHtml = isInvalid ? `<div class="invalid-tooltip" style="position: absolute; right: 35px; top: -10px; background: #ff5555; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; pointer-events: none; z-index: 20;">! ${invalidMsg}</div>` : '';
+
+            let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+            let finalSlotClass = `slot filled ${activeClass} ${isSelectable} ${isInvalid ? 'invalid-slot' : ''}`;
 
             slotsHtml += `
-            <div class="slot filled ${activeClass} ${isSelectable}" style="${slotStyle}" onclick="selectSlot(${i})" onmouseenter="this.querySelector('.jump-btn').style.display='flex'" onmouseleave="this.querySelector('.jump-btn').style.display='none'">
+            <div class="${finalSlotClass}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})" onmouseenter="this.querySelector('.jump-btn').style.display='flex'" onmouseleave="this.querySelector('.jump-btn').style.display='none'">
+                ${tooltipHtml}
                 ${jumpBtnHtml}
-                <div class="slot-icon" style="box-sizing: border-box; border: ${isActive ? '2px dashed #4DA8DA' : '2px solid transparent'}; border-radius: 4px; padding: 2px;">${buildSpriteHTML(p, 1.2)}</div>
+                <div class="slot-icon" style="box-sizing: border-box; border: ${isActive ? (isInvalid ? '2px dashed #ff5555' : '2px dashed #4DA8DA') : '2px solid transparent'}; border-radius: 4px; padding: 2px;">${buildSpriteHTML(p, 1.2)}</div>
                 <div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1; padding-right: 40px; box-sizing: border-box;">
                     <div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
-                        <span class="slot-name" style="font-size: 20px; text-shadow: 2px 2px 4px #000; font-weight: bold; letter-spacing: 0.5px;">${p.name}</span>
-                        <span class="slot-tier" style="font-size: 13px; opacity: 0.7;">Tier ${p.tier}</span>
+                        <span class="slot-name" style="font-size: 20px; text-shadow: 2px 2px 4px #000; font-weight: bold; letter-spacing: 0.5px; color: ${isInvalid ? '#ff5555' : 'inherit'};">${p.name}</span>
+                        <span class="slot-tier" style="font-size: 13px; opacity: 0.7; color: ${isInvalid ? '#ff5555' : 'inherit'};">Tier ${p.tier}</span>
                     </div>
                     ${advHtml}
                 </div>
@@ -1121,8 +1207,10 @@ function render() {
             </div>`;
         } else {
             let label = i === 0 ? "Energy Builder" : "Select Power...";
+            let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+
             slotsHtml += `
-            <div class="slot empty ${activeClass} ${isSelectable}" style="${slotStyle}" onclick="selectSlot(${i})">
+            <div class="slot empty ${activeClass} ${isSelectable}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})">
                 <div class="slot-icon"><div style="box-sizing: border-box; width: 50px; height: 50px; border: ${isActive ? '2px dashed #4DA8DA' : '2px dashed rgba(255,255,255,0.2)'}; border-radius: 4px;"></div></div>
                 <div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
                     <div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
@@ -1163,20 +1251,26 @@ function render() {
             let isSelected = build.powers.includes(power.id);
             let isExpanded = (expandedPowerId === power.id);
             
-            let simBuild = [...build.powers];
-            let testSlot = activeSlotIndex;
+            let isLocked = false;
             
-            if (testSlot === 0 && power.tier !== "EB") {
-                for (let i = 1; i < MAX_POWERS; i++) {
-                    if (simBuild[i] === null) {
-                        testSlot = i;
-                        break;
-                    }
-                }
+            // Hard Limit: Only One Ultimate Allowed
+            if (!isSelected && power.tier == 4) {
+                let hasUlt = build.powers.some(pid => pid && powers.find(x => x.id === pid)?.tier == 4);
+                if (hasUlt) isLocked = true;
             }
             
-            simBuild[testSlot] = power.id;
-            let isLocked = !isSelected && !validateFullBuild(simBuild);
+            // Hard Limit: Only One Energy Unlock Allowed
+            if (!isSelected && power.isEnergyUnlock) {
+                let hasUnlock = build.powers.some(pid => pid && powers.find(x => x.id === pid)?.isEnergyUnlock);
+                if (hasUnlock) isLocked = true;
+            }
+
+            // Can this power legally go into the currently active slot?
+            if (!isSelected && !isLocked) {
+                if (!checkUnlockForSlot(power, activeSlotIndex, build.powers)) {
+                    isLocked = true;
+                }
+            }
 
             let div = document.createElement('div');
             div.id = 'lib-power-' + power.id; 
@@ -1199,6 +1293,8 @@ function render() {
                 let currentPoints = 0;
                 let activeAdvs = build.adv[power.id] || [];
                 activeAdvs.forEach(aName => {
+                    if (power.isEnergyUnlock && (aName === "Rank 2" || aName === "Rank 3")) return;
+                    
                     let advObj = power.adv.find(a => a.name === aName);
                     if(advObj && !advObj.isHidden) currentPoints += advObj.cost;
                 });
@@ -1209,16 +1305,18 @@ function render() {
                 
                 power.adv.forEach(a => {
                     if (a.isHidden) return; 
+                    
+                    if (power.isEnergyUnlock && (a.name === "Rank 2" || a.name === "Rank 3")) return;
 
                     let isActive = activeAdvs.includes(a.name);
-                    let isLocked = (a.name === "Rank 3" && !activeAdvs.includes("Rank 2"));
+                    let isLockedAdv = (a.name === "Rank 3" && !activeAdvs.includes("Rank 2"));
                     
                     let btn = document.createElement('div');
-                    btn.className = `adv-btn ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`;
+                    btn.className = `adv-btn ${isActive ? 'active' : ''} ${isLockedAdv ? 'locked' : ''}`;
                     btn.innerText = `${a.name} (${a.cost})`;
                     btn.onclick = (e) => { 
                         e.stopPropagation(); 
-                        if (!isLocked) window.toggleAdvantage(power.id, a.name, a.cost); 
+                        if (!isLockedAdv) window.toggleAdvantage(power.id, a.name, a.cost); 
                     };
                     advContainer.appendChild(btn);
                 });
@@ -1281,13 +1379,9 @@ function exportCode() {
     
     let vParams = build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.');
 
-    // Final code completely drops base64 'btoa'
     const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
-    
-    // --- THIS IS THE FIX: IT AUTOMATICALLY DETECTS YOUR ACTUAL DOMAIN ---
     const currentUrl = window.location.origin + window.location.pathname; 
     const fullExportLink = `${currentUrl}?b=${finalCode}`;
-    // ------------------------------------------------------------------
     
     const exportInput = document.getElementById('export-link');
     exportInput.value = fullExportLink;
@@ -1295,6 +1389,47 @@ function exportCode() {
     navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
         exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
     });
+}
+
+// --- IMPORT SORTING ENGINE (GREEDY METHOD) ---
+function greedySortPowers(powerIds) {
+    let sorted = new Array(14).fill(null);
+    let pool = powerIds.filter(id => id !== null);
+    
+    // 1. Force the Energy Builder to slot 0 if one exists
+    let ebIndex = pool.findIndex(id => powers.find(x => x.id === id)?.tier === "EB");
+    if (ebIndex !== -1) {
+        sorted[0] = pool[ebIndex];
+        pool.splice(ebIndex, 1);
+    }
+    
+    // 2. Begin slotting general powers at slot 1
+    let nextSlot = 1; 
+    let changed = true;
+    
+    // Loop until we can no longer find a legally permitted placement
+    while (changed && pool.length > 0) {
+        changed = false;
+        for (let i = 0; i < pool.length; i++) {
+            let p = powers.find(x => x.id === pool[i]);
+            if (p && checkUnlockForSlot(p, nextSlot, sorted)) {
+                sorted[nextSlot] = pool[i];
+                pool.splice(i, 1);
+                nextSlot++;
+                changed = true;
+                break;
+            }
+        }
+    }
+    
+    // 3. Dump whatever rules-breaking powers are left over into the remaining slots
+    while (pool.length > 0 && nextSlot < 14) {
+        if (nextSlot === 0) nextSlot = 1; 
+        sorted[nextSlot] = pool.shift();
+        nextSlot++;
+    }
+    
+    return sorted;
 }
 
 // --- HYBRID UNIVERSAL IMPORT ENGINE ---
@@ -1310,13 +1445,11 @@ function importCode(providedCode = null) {
 
     if (!inputStr) return;
 
-    // --- THE FIX: Strip URL wrappers if a full link is pasted locally ---
     if (inputStr.includes('?b=')) {
         inputStr = inputStr.split('?b=')[1].split('&')[0];
     } else if (inputStr.includes('?build=')) {
         inputStr = inputStr.split('?build=')[1].split('&')[0];
     }
-    // --------------------------------------------------------------------
 
     if (inputStr.includes("http") && (inputStr.includes("v=") || inputStr.includes("d="))) {
         // --- AESICA LEGACY TRANSLATOR ---
@@ -1396,13 +1529,14 @@ function importCode(providedCode = null) {
         }
 
         if (newBuild.powers.some(p => p !== null)) {
+            newBuild.powers = greedySortPowers(newBuild.powers); 
             build = newBuild;
             if (powersets.find(pset => pset.id === build.set)) currentSet = build.set;
             expandedPowerId = null; 
             let nextEmpty = build.powers.indexOf(null);
             activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
             if(typeof render === "function") render(); 
-            if(typeof showMessage === "function") showMessage("Legacy build translated successfully!", "success"); 
+            if(typeof showMessage === "function") showMessage("Legacy build translated & sorted!", "success"); 
         } else {
             if(typeof showMessage === "function") showMessage("Could not map any powers to your database.", "error");
         }
@@ -1508,6 +1642,7 @@ function importCode(providedCode = null) {
         }
         
         if (newBuild.powers.some(p => p !== null)) {
+            newBuild.powers = greedySortPowers(newBuild.powers); 
             build = newBuild;
             if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
             expandedPowerId = null; 
@@ -1623,6 +1758,7 @@ function importCode(providedCode = null) {
                 }
                 
                 if (newBuild.powers.some(p => p !== null)) {
+                    newBuild.powers = greedySortPowers(newBuild.powers); 
                     build = newBuild;
                     if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
                     expandedPowerId = null; 
@@ -1701,13 +1837,14 @@ function importCode(providedCode = null) {
                 }
                 
                 if (newBuild.powers.some(p => p !== null)) {
+                    newBuild.powers = greedySortPowers(newBuild.powers); 
                     build = newBuild;
                     if (powersets.find(pset => pset.id === loadedSet)) currentSet = loadedSet;
                     expandedPowerId = null; 
                     let nextEmpty = build.powers.indexOf(null);
                     activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
                     if(typeof render === "function") render(); 
-                    if(typeof showMessage === "function") showMessage("Legacy build loaded successfully!", "success"); 
+                    if(typeof showMessage === "function") showMessage("Legacy build loaded & sorted!", "success"); 
                 } else {
                     if(typeof showMessage === "function") showMessage("Invalid build code.", "error");
                 }
@@ -1719,7 +1856,6 @@ function importCode(providedCode = null) {
 }
 
 // --- AUTO-LOAD BUILD FROM URL ---
-// Updated to check for both the old 'build' parameter and the new 'b' parameter
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const incomingBuildCode = urlParams.get('b') || urlParams.get('build');
@@ -1732,4 +1868,16 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-setTimeout(render, 200);
+// INITIALIZE APP
+setTimeout(() => {
+    // Inject Energy Unlock Flag dynamically during initialization based on HCData
+    if (typeof HCData !== 'undefined') {
+        powers.forEach(p => {
+            let match = HCData.power.find(hp => hp && hp.name && hp.name.toLowerCase() === p.name.toLowerCase());
+            if (match && match.range === "Energy Unlock") {
+                p.isEnergyUnlock = true;
+            }
+        });
+    }
+    render();
+}, 200);

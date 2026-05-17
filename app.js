@@ -1452,14 +1452,20 @@ function importCode(providedCode = null) {
     }
 
     if (inputStr.includes("http") && (inputStr.includes("v=") || inputStr.includes("d="))) {
-        // --- AESICA LEGACY TRANSLATOR ---
-        if (typeof window.AesicaTranslator === 'undefined') {
-            return typeof showMessage === "function" ? showMessage("Translator module missing!", "error") : alert("Translator missing!");
-        }
+        let plainTextData = null;
 
-        let plainTextData = window.AesicaTranslator.decode(inputStr);
+        // --- THE SIMPLE ROUTER (Restored for Balak links!) ---
+        if (inputStr.toLowerCase().includes("balak")) {
+            if (typeof window.BalakTranslator === 'undefined') return typeof showMessage === "function" ? showMessage("Balak Translator module missing!", "error") : alert("Translator missing!");
+            plainTextData = window.BalakTranslator.decode(inputStr);
+        } else {
+            if (typeof window.AesicaTranslator === 'undefined') return typeof showMessage === "function" ? showMessage("Aesica Translator module missing!", "error") : alert("Translator missing!");
+            plainTextData = window.AesicaTranslator.decode(inputStr);
+        }
+        // ----------------------------------------------------
+
         if (!plainTextData) {
-            return typeof showMessage === "function" ? showMessage("Failed to decode Aesica link.", "error") : alert("Failed to decode.");
+            return typeof showMessage === "function" ? showMessage("Failed to decode link.", "error") : alert("Failed to decode.");
         }
 
         let newBuild = { 
@@ -1536,7 +1542,7 @@ function importCode(providedCode = null) {
             let nextEmpty = build.powers.indexOf(null);
             activeSlotIndex = nextEmpty !== -1 ? nextEmpty : 13;
             if(typeof render === "function") render(); 
-            if(typeof showMessage === "function") showMessage("Legacy build translated & sorted!", "success"); 
+            if(typeof showMessage === "function") showMessage("External build translated & sorted!", "success"); 
         } else {
             if(typeof showMessage === "function") showMessage("Could not map any powers to your database.", "error");
         }

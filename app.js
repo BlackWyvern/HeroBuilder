@@ -81,8 +81,6 @@ if (!document.getElementById('hud-layout-overrides')) {
                 left: auto;
                 transform: none;
             }
-			
-			
 
 			/* --- POWER LIBRARY & ACTIVE SLOT HOVER TOOLTIPS --- */
 				.power, .slot { position: relative; overflow: visible !important; }
@@ -332,10 +330,11 @@ function renderTalentSelectionModal() {
         // Formats tooltips cleanly, substituting old source <br /> breaks with newline spaces
         let plainTooltipDesc = t.desc.replace(/<br\s*\/?>/gi, '\n');
         
+        // REDUCED: Dropped padding from 15px to 6px/10px, min-height from 75px to 46px
         html += `
-        <div class="power" style="${selectedStyle} padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 75px;" onclick="setTalentForSlot('${t.id}')" title="${plainTooltipDesc}">
-            <div class="name" style="font-size: 16px; font-weight: bold; color: #4DA8DA; text-shadow: 1px 1px 2px #000;">${t.name}</div>
-            <div style="font-size: 12px; color: #888; margin-top: 6px; font-family: monospace;">${t.stats}</div>
+        <div class="power" style="${selectedStyle} padding: 6px 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 46px; border-radius: 4px; cursor: pointer;" onclick="setTalentForSlot('${t.id}')" title="${plainTooltipDesc}">
+            <div class="name" style="font-size: 14px; font-weight: bold; color: #4DA8DA; text-shadow: 1px 1px 2px #000; line-height: 1.2;">${t.name}</div>
+            <div style="font-size: 11px; color: #888; margin-top: 2px; font-family: monospace;">${t.stats}</div>
         </div>`;
     });
     

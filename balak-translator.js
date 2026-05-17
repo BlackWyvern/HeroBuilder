@@ -75,6 +75,7 @@ window.BalakTranslator = (function() {
                 powers: [], 
                 specs: { primary: null, sec1: null, sec2: null, mastery: null, perks: [] },
                 devices: [null, null, null, null, null],
+				talents: new Array(7).fill(null),
                 role: null
             };
 
@@ -89,13 +90,28 @@ window.BalakTranslator = (function() {
             let innateCode2 = d[i++];
             let innate = urlCodeToNum2(innateCode1 + innateCode2);
 
+            // Balak's original index fix shifts
             if (innate == 57) innate = 36;
             else if (innate == 51) innate = 50;
             else if (innate == 50) innate = 51;
             else if (innate == 36) innate = 57;
 
-            for(let t=0; t<6; t++) i++; 
-            for(let tp=0; tp<4; tp++) i++; 
+            // Map the innate choice to slot 0
+            if (innate > 0 && typeof CO_TALENTS !== 'undefined') {
+                let innateObj = CO_TALENTS.filter(x => x.type === "innate")[innate - 1];
+                if (innateObj) plainTextBuild.talents[0] = innateObj.id;
+            }
+
+            // Read the 6 progressive choices directly from the URL stream
+            for(let t=0; t<6; t++) {
+                let progIdx = urlCodeToNum(d[i++]);
+                if (progIdx > 0 && typeof CO_TALENTS !== 'undefined') {
+                    let progObj = CO_TALENTS.filter(x => x.type === "progressive")[progIdx - 1];
+                    if (progObj) plainTextBuild.talents[t + 1] = progObj.id;
+                }
+            }
+            
+            for(let tp=0; tp<4; tp++) i++; // Skip Travel Powers
 
             // POWERS
             for(let p=0; p<14; p++) {

@@ -1652,16 +1652,20 @@ function exportCode() {
 
 	let vParams = build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.');
 
-	const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}`;
-	const currentUrl = window.location.origin + window.location.pathname;
-	const fullExportLink = `${currentUrl}?b=${finalCode}`;
+	// --- ENCODE TALENTS ROW ---
+    let talentParams = build.talents ? build.talents.map(t => t !== null ? toB36(CO_TALENTS.findIndex(x => x.id === t)) : "").join('.') : "......";
 
-	const exportInput = document.getElementById('export-link');
-	exportInput.value = fullExportLink;
-
-	navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
-		exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
-	});
+	// Appended talentParams as the 8th block parameter
+    const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}-${talentParams}`;
+    const currentUrl = window.location.origin + window.location.pathname; 
+    const fullExportLink = `${currentUrl}?b=${finalCode}`;
+    
+    const exportInput = document.getElementById('export-link');
+    exportInput.value = fullExportLink;
+    
+    navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
+        exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
+    });
 }
 
 // --- IMPORT SORTING ENGINE (GREEDY METHOD) ---
@@ -1749,6 +1753,7 @@ function importCode(providedCode = null) {
 			specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
 			devices: new Array(5).fill(null),
 			variants: new Array(5).fill(null),
+			talents: plainTextData.talents || new Array(7).fill(null),
 			cams: { polarity: 'Blue', level: 0 }
 		};
 
@@ -1835,6 +1840,7 @@ function importCode(providedCode = null) {
 			powers: new Array(14).fill(null), adv: {},
 			specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
 			devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+			talents: new Array(7).fill(null),
 			cams: { polarity: 'Blue', level: 0 }
 		};
 
@@ -1919,6 +1925,17 @@ function importCode(providedCode = null) {
 				if(vIdx !== null && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
 			}
 		}
+		
+		// --- DECODE TALENTS ROW ---
+        if (blocks[7]) {
+            let talentData = blocks[7].split('.');
+            for(let i = 0; i < 7 && i < talentData.length; i++) {
+                let tIdx = fromB36(talentData[i]);
+                if(tIdx !== null && CO_TALENTS[tIdx]) {
+                    newBuild.talents[i] = CO_TALENTS[tIdx].id;
+                }
+            }
+        }
 
 		if (newBuild.powers.some(p => p !== null)) {
 			newBuild.powers = greedySortPowers(newBuild.powers);
@@ -1949,6 +1966,7 @@ function importCode(providedCode = null) {
 					powers: new Array(14).fill(null), adv: {},
 					specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
 					devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+					talents: new Array(7).fill(null),
 					cams: { polarity: 'Blue', level: 0 }
 				};
 
@@ -2056,6 +2074,7 @@ function importCode(providedCode = null) {
 					powers: new Array(14).fill(null), adv: {},
 					specs: { primary: null, sec1: null, sec2: null, mastery: null, points: {} },
 					devices: new Array(5).fill(null), variants: new Array(5).fill(null),
+					talents: new Array(7).fill(null),
 					cams: { polarity: 'Blue', level: 0 }
 				};
 

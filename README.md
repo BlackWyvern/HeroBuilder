@@ -44,7 +44,7 @@ and this project would not be possible without her foundation.
 
 find her herocreator at   https://aesica.net/co/beta/herocreator.htm
 
-Updated spec information comes from Behemoth King's Powerhouse project
+Updated spec information AND the ability to import balaknightfang build links comes from Behemoth King's Powerhouse project
 
 you can find it here    https://woof-wolf.github.io/powerhouse/index.html
 

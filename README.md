@@ -14,7 +14,7 @@ This tool allows players to map out powers, advantages, devices, PVD's, speciali
 * **Extensible Architecture:** Built to easily accommodate custom powers, devices, and variants.
 
 ## Installation & Usage
-https://vtwind.github.io/HeroBuilder/
+https://blackwyvern.github.io/HeroBuilder/
 You can use the live version hosted on GitHub Pages right now, or run it locally yourself. Since this is a purely frontend application, there are no complex dependencies to install or servers to configure.
 
 1. Clone or download this repository to your local machine.
@@ -51,17 +51,17 @@ Updated spec information AND the ability to import balaknightfang build links co
 
 you can find it here    https://woof-wolf.github.io/powerhouse/index.html
 
+VTWind's base version of this new hero builder
+
+https://vtwind.github.io/HeroBuilder/
+
 ======================  CONTRIBUTORS & TESTERS ======================
 
-NightSinger - Provided the initial list of powers when first making the app
-
-Sofist  - Tester    
-Mewblox - Tester
-
+Me.
 
 ============ DISCLAIMER =============
 
-This software was coded with the help of Google Gemini Pro AI. 
+This software was coded with the help of Google Gemini Pro AI. And edited with more Gemini Pro.
 AI is not perfect, this project was simply made for fun over the span of a few days.
 Please report all bugs, typos, old information, missing information and any other relevant issues to me via discord or github.
 

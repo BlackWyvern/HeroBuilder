@@ -5,7 +5,7 @@ A lightweight build planner for Champions Online. Built on the solid foundations
 This tool allows players to map out powers, advantages, devices, PVD's, specializations and stats, making build sharing cleaner and easier than ever.
 
 -- Updated by BlackWyvern
-* **Added Talents:** Should correctly import talents from all external sources. Added talent exporting to current export model, that does not interfere with VTWind's current implimentation.
+* **Added Talents:** Should correctly import talents from all external sources. Added talent exporting to current export model, that .. Shouldn't? interfere with VTWind's current implimentation.
 
 ## Features
 

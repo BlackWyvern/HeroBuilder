@@ -19,7 +19,8 @@ const CustomContent = {
         { id: "custom_pwr_lightwave", set: "laser_sword", name: "Lightwave", tier: 2, desc: "", adv: [ { name: "Illuminate", cost: 2 }, { name: "Bad Footing", cost: 2 }, { name: "Accelerated Metabolism", cost: 1 }, { name: "Challenge!", cost: 1 } ] },
         { id: "custom_pwr_scorpion_sting", set: "fighting_claws", name: "Scorpion Sting", tier: 1, desc: "", adv: [ { name: "Sudden Strike", cost: 2 }, { name: "Trauma", cost: 2 }, { name: "Stop Right There!", cost: 2 }, { name: "Accelerated Metabolism", cost: 1 }, { name: "Break Through", cost: 3 }, { name: "Challenge!", cost: 1 } ] },
         { id: "custom_pwr_spitting_cobra", set: "fighting_claws", name: "Spitting Cobra", tier: 1, desc: "", adv: [ { name: "Pin Down", cost: 2 }, { name: "Sharp Edges", cost: 2 }, { name: "Nailed to the Ground", cost: 2 }, { name: "Accelerated Metabolism", cost: 1 }, { name: "Break Through", cost: 3 }, { name: "Challenge!", cost: 1 } ] },
-        { id: "custom_pwr_heel_smash", set: "might", name: "Heel Smash", tier: 1, desc: "", adv: [ { name: "Reckless Endangerment", cost: 2 }, { name: "Sonic Reverberations", cost: 2 }, { name: "Dizzying Impact", cost: 2 }, { name: "Accelerated Metabolism", cost: 1 }, { name: "Challenge!", cost: 1 } ] }
+        { id: "custom_pwr_heel_smash", set: "might", name: "Heel Smash", tier: 1, desc: "", adv: [ { name: "Reckless Endangerment", cost: 2 }, { name: "Sonic Reverberations", cost: 2 }, { name: "Dizzying Impact", cost: 2 }, { name: "Accelerated Metabolism", cost: 1 }, { name: "Challenge!", cost: 1 } ] },
+		{ id: "custom_pwr_frigid_determination", set: "ice", name: "Frigid Determination", tier: 1, desc: "Toggle - Form - Dexterity. Grants stacks of Focus for each rank of this power you have. Each stack primarily increases Melee damage and provides a smaller increase to Ranged damage. Scales with DEXTERITY.", adv: [], spriteX: 0, spriteY: 0, width: 0, height: 0, renderScale: 1 }
     ],
     existingPowerAdvantages: [
         { powerName: "Desperate Shot", adv: [ { name: "Frail Armor", cost: 2 } ] },
@@ -131,7 +132,8 @@ const SpriteMap = {
     "Eagle’s Grasp": { x: 32, y: 42 }, "Scarlet Arc": { x: 96, y: 42 }, "Wrathful Blade": { x: 192, y: 168 }, "Tornado": { x: 224, y: 0 },
     "Prismatic Detonation": { x: 192, y: 0 }, "Shadow Strike": { x: 0, y: 378 }, "Master of the Mind": { x: 64, y: 378 }, "Endbringer's Grasp": { x: 32, y: 210 }, 
     "Chest Rocket Assault": { x: 96, y: 210 }, "Dual Submachinegun": { x: 96, y: 336 }, "Brutal Charge": { x: 64, y: 420 }, "Concentration": { x: 128, y: 210 },
-    "Storm Cloud": { x: 128, y: 0 }, "Sundering Breath": { x: 160, y: 0 }, "Cold Shoulder": { x: 224, y: 168 }, "Pyromancer's Blades": { x: 0, y: 210 }, "Electric Form": { x: 64, y: 0 }
+    "Storm Cloud": { x: 128, y: 0 }, "Sundering Breath": { x: 160, y: 0 }, "Cold Shoulder": { x: 224, y: 168 }, "Pyromancer's Blades": { x: 0, y: 210 }, "Electric Form": { x: 64, y: 0 },
+	"Frigid Determination": { x: 224, y: 252}
 };
 
 // ==============================================================================

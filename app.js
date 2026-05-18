@@ -24,63 +24,63 @@ if (!document.getElementById('hud-layout-overrides')) {
 			#perk-list-container { overflow-y: auto !important; flex: 1 !important; padding-right: 15px !important; margin-top: 10px !important; }
 
 			/* --- SMART BOUNDARY-AWARE TOOLTIP SYSTEM --- */
-            .spec-perk, .active-perk-icon, .power, .slot { overflow: visible !important; position: relative; } 
-            .spec-perk-desc { display: none !important; } 
-            .spec-perk:hover, .active-perk-icon:hover, .power:hover, .slot:hover { z-index: 100; }
-            
-            /* Master Baseline Style for all Custom HTML Tooltips */
-            .spec-perk-tooltip, .power .tooltip, .slot .power-spec-tooltip {
-                visibility: hidden;
-                opacity: 0;
-                position: absolute;
-                bottom: 115%; /* Elevated slightly to clear borders cleanly */
-                background: #1a1a1a;
-                border: 1px solid #4DA8DA;
-                padding: 12px;
-                border-radius: 6px;
-                width: 280px;
-                z-index: 9999;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.9);
-                font-size: 15px;
-                color: #ddd;
-                pointer-events: none;
-                transition: opacity 0.15s ease-in-out;
-                text-align: left;
-                line-height: 1.4;
-            }
-            
-            /* Global Hover Trigger */
-            .spec-perk:hover .spec-perk-tooltip, 
-            .active-perk-icon:hover .spec-perk-tooltip,
-            .power:hover .tooltip,
-            .slot:hover .power-spec-tooltip {
-                visibility: visible;
-                opacity: 1;
-            }
-            
-            /* --- VERTICAL BOUNDARY FLIPS FOR TOP-ROW ELEMENTS --- */
-            
-            /* Top 4 slots in the builder track: Flip to render downward */
-            .right-col .slot:nth-child(-n+4) .power-spec-tooltip {
-                bottom: auto;
-                top: 115%;
-                box-shadow: 0 -5px 15px rgba(0,0,0,0.9); /* Invert shadow direction */
-            }
-            
-            /* Top tiers in the power library (Energy Builders & Tier 0/1): Flip to render downward */
-            .left-col .tier-section:nth-child(-n+2) .power .tooltip {
-                bottom: auto;
-                top: 115%;
-                box-shadow: 0 -5px 15px rgba(0,0,0,0.9);
-            }
-            
-            /* Specialization HUD Tracks (Lower Right side of pane): Align right, expand safely westward */
-            .hud-perks .spec-perk-tooltip,
-            .spec-perk .spec-perk-tooltip {
-                right: 0;
-                left: auto;
-                transform: none;
-            }
+			.spec-perk, .active-perk-icon, .power, .slot { overflow: visible !important; position: relative; }
+			.spec-perk-desc { display: none !important; }
+			.spec-perk:hover, .active-perk-icon:hover, .power:hover, .slot:hover { z-index: 100; }
+
+			/* Master Baseline Style for all Custom HTML Tooltips */
+			.spec-perk-tooltip, .power .tooltip, .slot .power-spec-tooltip {
+				visibility: hidden;
+				opacity: 0;
+				position: absolute;
+				bottom: 115%; /* Elevated slightly to clear borders cleanly */
+				background: #1a1a1a;
+				border: 1px solid #4DA8DA;
+				padding: 12px;
+				border-radius: 6px;
+				width: 280px;
+				z-index: 9999;
+				box-shadow: 0 5px 15px rgba(0,0,0,0.9);
+				font-size: 15px;
+				color: #ddd;
+				pointer-events: none;
+				transition: opacity 0.15s ease-in-out;
+				text-align: left;
+				line-height: 1.4;
+			}
+
+			/* Global Hover Trigger */
+			.spec-perk:hover .spec-perk-tooltip,
+			.active-perk-icon:hover .spec-perk-tooltip,
+			.power:hover .tooltip,
+			.slot:hover .power-spec-tooltip {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			/* --- VERTICAL BOUNDARY FLIPS FOR TOP-ROW ELEMENTS --- */
+
+			/* Top 4 slots in the builder track: Flip to render downward */
+			.right-col .slot:nth-child(-n+4) .power-spec-tooltip {
+				bottom: auto;
+				top: 115%;
+				box-shadow: 0 -5px 15px rgba(0,0,0,0.9); /* Invert shadow direction */
+			}
+
+			/* Top tiers in the power library (Energy Builders & Tier 0/1): Flip to render downward */
+			.left-col .tier-section:nth-child(-n+2) .power .tooltip {
+				bottom: auto;
+				top: 115%;
+				box-shadow: 0 -5px 15px rgba(0,0,0,0.9);
+			}
+
+			/* Specialization HUD Tracks (Lower Right side of pane): Align right, expand safely westward */
+			.hud-perks .spec-perk-tooltip,
+			.spec-perk .spec-perk-tooltip {
+				right: 0;
+				left: auto;
+				transform: none;
+			}
 
 			/* --- POWER LIBRARY & ACTIVE SLOT HOVER TOOLTIPS --- */
 				.power, .slot { position: relative; overflow: visible !important; }
@@ -167,179 +167,179 @@ if (typeof iconPlacements !== 'undefined') {
 
 // --- CO TALENTS DATABASE ---
 const CO_TALENTS = [
-    { id: "t_sureshot", name: "Sureshot", type: "innate", stats: "Dex: 12, Int: 12", desc: "Your hand-eye coordination is unmatched.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_abyssal", name: "Abyssal", type: "innate", stats: "Con: 12, End: 12", desc: "You draw your power from dark places.<br />Con: 12, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_energized", name: "Energized", type: "innate", stats: "End: 12, Rec: 12", desc: "The power flows through you.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
-    { id: "t_incandescent", name: "Incandescent", type: "innate", stats: "Pre: 12, Rec: 12", desc: "A fire burns deep within you.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 12, Rec: 12" },
-    { id: "t_impetus", name: "Impetus", type: "innate", stats: "End: 12, Ego: 12", desc: "Your power is unstoppable.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
-    { id: "t_tech_savvy", name: "Tech Savvy", type: "innate", stats: "End: 12, Int: 12", desc: "You know what makes things tick.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_absolute_zero", name: "Absolute Zero", type: "innate", stats: "Dex: 12, Rec: 12", desc: "You have a cold outlook on life.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
-    { id: "t_one_of_mind_and_body", name: "One of Mind and Body", type: "innate", stats: "Str: 12, Dex: 12", desc: "You have achieved the balance.<br />Con: 5, End: 5, Str: 12, Dex: 12, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_superhuman", name: "Superhuman", type: "innate", stats: "Con: 12, Str: 12", desc: "You have the strength of many.<br />Con: 12, End: 5, Str: 12, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_quick_trigger", name: "Quick Trigger", type: "innate", stats: "Dex: 12, Ego: 12", desc: "You are fast on the draw.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
-    { id: "t_mechanized", name: "Mechanized", type: "innate", stats: "Str: 12, Int: 12", desc: "You know how to maximize efficiency.<br />Con: 5, End: 5, Str: 12, Dex: 5, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_arcanus", name: "Arcanus", type: "innate", stats: "Int: 12, Pre: 12", desc: "You have an intuitive grasp of magic.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 12, Ego: 5, Pre: 12, Rec: 5" },
-    { id: "t_inhuman", name: "Inhuman", type: "innate", stats: "Con: 12, Rec: 12", desc: "You have an unspeakable heritage.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
-    { id: "t_matter_manipulator", name: "Matter Manipulator", type: "innate", stats: "Con: 12, Ego: 12", desc: "You know what it takes to get things moving.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
-    { id: "t_mind_over_matter", name: "Mind over Matter", type: "innate", stats: "Ego: 12, Pre: 12", desc: "You know what motivates people.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 12, Rec: 5" },
-    { id: "t_the_hero", name: "The Hero", type: "innate", stats: "Con: 8, End: 6, Str: 8, Dex: 8, Int: 8, Ego: 8, Pre: 8, Rec: 6", desc: "The picture of balanced perfection, this character is the Jack-of-All-Trades, master of none, though often better than the master of one.<br />Con: 8, End: 6, Str: 8, Dex: 8, Int: 8, Ego: 8, Pre: 8, Rec: 6" },
-    { id: "t_divinity", name: "Divinity", type: "innate", stats: "Con: 12, Pre: 12", desc: "You have been inspired by forces beyond.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 12, Rec: 5" },
-    { id: "t_feral", name: "Feral", type: "innate", stats: "Str: 12, Rec: 12", desc: "Within you beats the heart of an animal.<br />Con: 5, End: 5, Str: 12, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
-    { id: "t_the_inferno", name: "The Inferno", type: "innate", stats: "End: 10, Dex: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Inferno.<br />Con: 5, End: 10, Str: 5, Dex: 10, Int: 5, Ego: 8, Pre: 5, Rec: 10" },
-    { id: "t_the_soldier", name: "The Soldier", type: "innate", stats: "Dex: 10, Int: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Soldier.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_blade", name: "The Blade", type: "innate", stats: "End: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Blade.<br />Con: 5, End: 8, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_savage", name: "The Savage", type: "innate", stats: "Con: 10, Str: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Brute.<br />Con: 10, End: 5, Str: 10, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_behemoth", name: "The Behemoth", type: "innate", stats: "Con: 10, End: 8, Str: 10, Rec: 10", desc: "This is the innate characteristic for The Behemoth.<br />Con: 10, End: 8, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_glacier", name: "The Glacier", type: "innate", stats: "Con: 10, End: 10, Dex: 8, Int: 10", desc: "This is the innate characteristic for The Glacier.<br />Con: 10, End: 10, Str: 5, Dex: 8, Int: 10, Ego: 5, Pre: 5, Rec: 5" },
-    { id: "t_the_mind", name: "The Mind", type: "innate", stats: "End: 10, Int: 8, Ego: 10, Pre: 10", desc: "This is the innate characteristic for The Mind.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 8, Ego: 10, Pre: 10, Rec: 5" },
-    { id: "t_the_grimoire", name: "The Grimoire", type: "innate", stats: "Int: 10, Ego: 10, Pre: 10, Rec: 8", desc: "This is the innate characteristic for The Grimoire.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 8" },
-    { id: "t_the_assassin", name: "The Assassin", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Ego: 10", desc: "This is the innate characteristic for The Assassin.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_marksman", name: "The Marksman", type: "innate", stats: "End: 8, Dex: 10, Int: 10, Ego: 10", desc: "This is the innate characteristic for The Marksman.<br />Con: 5, End: 8, Str: 5, Dex: 10, Int: 10, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_void", name: "The Void", type: "innate", stats: "Con: 10, End: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Void.<br />Con: 10, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_inventor", name: "The Inventor", type: "innate", stats: "End: 8, Int: 10, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Inventor.<br />Con: 5, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 5, Pre: 10, Rec: 10" },
-    { id: "t_the_tempest", name: "The Tempest", type: "innate", stats: "End: 10, Dex: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Tempest.<br />Con: 5, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_devastator", name: "The Devastator", type: "innate", stats: "Con: 10, End: 8, Str: 10, Rec: 10", desc: "This is the innate characteristic for The Devastator.<br />Con: 10, End: 8, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_disciple", name: "The Disciple", type: "innate", stats: "Dex: 10, Int: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Disciple.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_impulse", name: "The Impulse", type: "innate", stats: "End: 10, Int: 10, Ego: 10, Rec: 8", desc: "This is the innate characteristic for The Impulse.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 5, Rec: 8" },
-    { id: "t_the_fist", name: "The Fist", type: "innate", stats: "Str: 10, Dex: 10, Int: 10, Rec: 8", desc: "This is the innate characteristic for The Fist.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 10, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_protector", name: "The Protector", type: "innate", stats: "Con: 10, Str: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Master.<br />Con: 10, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_scourge", name: "The Scourge", type: "innate", stats: "Con: 10, End: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Scourge and The Cursed.<br />Con: 10, End: 8, Str: 5, Dex: 5, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_squall", name: "The Squall", type: "innate", stats: "End: 10, Dex: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Squall.<br />Con: 5, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_mountain", name: "The Mountain", type: "innate", stats: "Con: 10, End: 10, Str: 8, Ego: 10", desc: "This is the innate characteristic for The Mountain.<br />Con: 10, End: 10, Str: 8, Dex: 5, Int: 5, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_unleashed", name: "The Unleashed", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Rec: 10", desc: "This is the innate characteristic for The Unleashed.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_radiant", name: "The Radiant", type: "innate", stats: "Int: 10, Ego: 10, Pre: 10, Rec: 8", desc: "This is the innate characteristic for The Radiant.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 8" },
-    { id: "t_the_invincible", name: "The Invincible", type: "innate", stats: "Con: 10, End: 10, Int: 10, Ego: 8", desc: "This is the innate characteristic for The Invincible.<br />Con: 10, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 8, Pre: 5, Rec: 5" },
-    { id: "t_the_night_avenger", name: "The Night Avenger", type: "innate", stats: "End: 8, Str: 10, Dex: 10, Ego: 10", desc: "This is the innate characteristic for The Night Avenger.<br />Con: 5, End: 8, Str: 10, Dex: 10, Int: 5, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_chiller", name: "The Chiller", type: "innate", stats: "Con: 10, End: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Chiller.<br />Con: 10, End: 10, Str: 5, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_rockstar", name: "The Rockstar", type: "innate", stats: "Con: 10, End: 10, Str: 10, Rec: 8", desc: "This is the innate characteristic for The Rockstar.<br />Con: 10, End: 10, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_predator", name: "The Predator", type: "innate", stats: "Con: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Predator.<br />Con: 8, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_penitent", name: "The Penitent", type: "innate", stats: "End: 10, Str: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Penitent.<br />Con: 5, End: 10, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_hexslinger", name: "The Hexslinger", type: "innate", stats: "Dex: 10, Int: 10, Ego: 10, Pre: 8", desc: "This is the innate characteristic for The Hexslinger.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 10, Ego: 10, Pre: 8, Rec: 5" },
-    { id: "t_the_witch", name: "The Witch", type: "innate", stats: "Con: 10, Int: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Witch.<br />Con: 10, End: 5, Str: 5, Dex: 5, Int: 8, Ego: 5, Pre: 10, Rec: 10" },
-    { id: "t_the_automaton", name: "The Automaton", type: "innate", stats: "Con: 10, End: 8, Int: 10, Ego: 10", desc: "This is the innate characteristic for The Automaton.<br />Con: 10, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_cybernetic_warrior", name: "The Cybernetic Warrior", type: "innate", stats: "Con: 10, End: 10, Int: 10, Rec: 8", desc: "This is the innate characteristic for The Cybernetic Warrior.<br />Con: 10, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 5, Pre: 5, Rec: 8" },
-    { id: "t_the_gunslinger", name: "The Gunslinger", type: "innate", stats: "Con: 10, Dex: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Gunslinger.<br />Con: 10, End: 5, Str: 5, Dex: 10, Int: 5, Ego: 8, Pre: 5, Rec: 10" },
-    { id: "t_the_specialist", name: "The Specialist", type: "innate", stats: "Con: 10, Dex: 10, Int: 8, Rec: 10", desc: "This is the innate characteristic for The Specialist.<br />Con: 10, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_psychokinetic", name: "The Psychokinetic", type: "innate", stats: "End: 8, Dex: 10, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Psychokinetic.<br />Con: 5, End: 8, Str: 5, Dex: 10, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
-    { id: "t_the_blazing", name: "The Blazing", type: "innate", stats: "End: 10, Ego: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Blazing.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 5, Ego: 8, Pre: 10, Rec: 10" },
-    { id: "t_the_dragon", name: "The Dragon", type: "innate", stats: "Con: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Dragon.<br />Con: 8, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_master", name: "The Master", type: "innate", stats: "Con: 10, Str: 8, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Master.<br />Con: 10, End: 5, Str: 8, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_samurai", name: "The Samurai", type: "innate", stats: "Con: 10, End: 8, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Samurai.<br />Con: 10, End: 8, Str: 5, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_midnight", name: "The Midnight", type: "innate", stats: "Dex: 10, Int: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Midnight.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 5, Pre: 10, Rec: 10" },
-    { id: "t_the_wrecker", name: "The Wrecker", type: "innate", stats: "Con: 10, Str: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Wrecker.<br />Con: 10, End: 5, Str: 10, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
-    { id: "t_the_tenebrous", name: "The Tenebrous", type: "innate", stats: "Con: 8, Ego: 10, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Tenebrous.<br />Con: 8, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 10, Pre: 10, Rec: 10" },
-    { id: "t_the_combatant", name: "The Combatant", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Ego: 10", desc: "This is the innate characteristic for The Combatant.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 5" },
-    { id: "t_the_fissile", name: "The Fissile", type: "innate", stats: "Dex: 10, Int: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Fissile.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 10, Ego: 8, Pre: 5, Rec: 10" },
-    { id: "t_the_overseer", name: "The Overseer", type: "innate", stats: "End: 8, Int: 10, Ego: 10, Pre: 10", desc: "This is the innate characteristic for The Overseer.<br />Con: 5, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 5" },
-    { id: "t_mighty", name: "Mighty", type: "progressive", stats: "Str: 8", desc: "Increases attributes: Str: 8" },
-    { id: "t_agile", name: "Agile", type: "progressive", stats: "Dex: 8", desc: "Increases attributes: Dex: 8" },
-    { id: "t_enduring", name: "Enduring", type: "progressive", stats: "Con: 8", desc: "Increases attributes: Con: 8" },
-    { id: "t_brilliant", name: "Brilliant", type: "progressive", stats: "Int: 8", desc: "Increases attributes: Int: 8" },
-    { id: "t_indomitable", name: "Indomitable", type: "progressive", stats: "Ego: 8", desc: "Increases attributes: Ego: 8" },
-    { id: "t_intimidating", name: "Intimidating", type: "progressive", stats: "Pre: 8", desc: "Increases attributes: Pre: 8" },
-    { id: "t_tireless", name: "Tireless", type: "progressive", stats: "Rec: 8", desc: "Increases attributes: Rec: 8" },
-    { id: "t_energetic", name: "Energetic", type: "progressive", stats: "End: 8", desc: "Increases attributes: End: 8" },
-    { id: "t_martial_focus", name: "Martial Focus", type: "progressive", stats: "Str: 5, Dex: 5", desc: "Increases attributes: Str: 5, Dex: 5" },
-    { id: "t_physical_conditioning", name: "Physical Conditioning", type: "progressive", stats: "Str: 5, Con: 5", desc: "Increases attributes: Str: 5, Con: 5" },
-    { id: "t_body_and_mind", name: "Body and Mind", type: "progressive", stats: "Str: 5, Int: 5", desc: "Increases attributes: Str: 5, Int: 5" },
-    { id: "t_professional_athlete", name: "Professional Athlete", type: "progressive", stats: "Str: 5, Ego: 5", desc: "Increases attributes: Str: 5, Ego: 5" },
-    { id: "t_impressive_physique", name: "Impressive Physique", type: "progressive", stats: "Str: 5, Pre: 5", desc: "Increases attributes: Str: 5, Pre: 5" },
-    { id: "t_relentless", name: "Relentless", type: "progressive", stats: "Str: 5, Rec: 5", desc: "Increases attributes: Str: 5, Rec: 5" },
-    { id: "t_bodybuilder", name: "Bodybuilder", type: "progressive", stats: "Str: 5, End: 5", desc: "Increases attributes: Str: 5, End: 5" },
-    { id: "t_acrobat", name: "Acrobat", type: "progressive", stats: "Dex: 5, Con: 5", desc: "Increases attributes: Dex: 5, Con: 5" },
-    { id: "t_coordinated", name: "Coordinated", type: "progressive", stats: "Dex: 5, Int: 5", desc: "Increases attributes: Dex: 5, Int: 5" },
-    { id: "t_shooter", name: "Shooter", type: "progressive", stats: "Dex: 5, Ego: 5", desc: "Increases attributes: Dex: 5, Ego: 5" },
-    { id: "t_finesse", name: "Finesse", type: "progressive", stats: "Dex: 5, Pre: 5", desc: "Increases attributes: Dex: 5, Pre: 5" },
-    { id: "t_impresario", name: "Impresario", type: "progressive", stats: "Dex: 5, Rec: 5", desc: "Increases attributes: Dex: 5, Rec: 5" },
-    { id: "t_accurate", name: "Accurate", type: "progressive", stats: "Dex: 5, End: 5", desc: "Increases attributes: Dex: 5, End: 5" },
-    { id: "t_healthy_mind", name: "Healthy Mind", type: "progressive", stats: "Con: 5, Int: 5", desc: "Increases attributes: Con: 5, Int: 5" },
-    { id: "t_ascetic", name: "Ascetic", type: "progressive", stats: "Con: 5, Ego: 5", desc: "Increases attributes: Con: 5, Ego: 5" },
-    { id: "t_shrug_it_off", name: "Shrug It Off", type: "progressive", stats: "Con: 5, Pre: 5", desc: "Increases attributes: Con: 5, Pre: 5" },
-    { id: "t_quick_recovery", name: "Quick Recovery", type: "progressive", stats: "Con: 5, Rec: 5", desc: "Increases attributes: Con: 5, Rec: 5" },
-    { id: "t_boundless_reserves", name: "Boundless Reserves", type: "progressive", stats: "Con: 5, End: 5", desc: "Increases attributes: Con: 5, End: 5" },
-    { id: "t_academics", name: "Academics", type: "progressive", stats: "Int: 5, Ego: 5", desc: "Increases attributes: Int: 5, Ego: 5" },
-    { id: "t_diplomatic", name: "Diplomatic", type: "progressive", stats: "Int: 5, Pre: 5", desc: "Increases attributes: Int: 5, Pre: 5" },
-    { id: "t_negotiator", name: "Negotiator", type: "progressive", stats: "Int: 5, Rec: 5", desc: "Increases attributes: Int: 5, Rec: 5" },
-    { id: "t_investigator", name: "Investigator", type: "progressive", stats: "Int: 5, End: 5", desc: "Increases attributes: Int: 5, End: 5" },
-    { id: "t_showmanship", name: "Showmanship", type: "progressive", stats: "Ego: 5, Pre: 5", desc: "Increases attributes: Ego: 5, Pre: 5" },
-    { id: "t_worldly", name: "Worldly", type: "progressive", stats: "Ego: 5, Rec: 5", desc: "Increases attributes: Ego: 5, Rec: 5" },
-    { id: "t_daredevil", name: "Daredevil", type: "progressive", stats: "Ego: 5, End: 5", desc: "Increases attributes: Ego: 5, End: 5" },
-    { id: "t_lasting_impression", name: "Lasting Impression", type: "progressive", stats: "Pre: 5, Rec: 5", desc: "Increases attributes: Pre: 5, Rec: 5" },
-    { id: "t_prodigy", name: "Prodigy", type: "progressive", stats: "Pre: 5, End: 5", desc: "Increases attributes: Pre: 5, End: 5" },
-    { id: "t_amazing_stamina", name: "Amazing Stamina", type: "progressive", stats: "Rec: 5, End: 5", desc: "Increases attributes: Rec: 5, End: 5" },
-    { id: "t_covert_ops_training", name: "Covert Ops Training", type: "progressive", stats: "Con: 3, Str: 3, Dex: 3, Int: 3", desc: "Increases attributes: Con: 3, Str: 3, Dex: 3, Int: 3" },
-    { id: "t_martial_training", name: "Martial Training", type: "progressive", stats: "Str: 3, Dex: 3, Ego: 3, Rec: 3", desc: "Increases attributes: Str: 3, Dex: 3, Ego: 3, Rec: 3" },
-    { id: "t_paramilitary_training", name: "Paramilitary Training", type: "progressive", stats: "Con: 3, End: 3, Str: 3, Rec: 3", desc: "Increases attributes: Con: 3, End: 3, Str: 3, Rec: 3" },
-    { id: "t_discipline_training", name: "Discipline Training", type: "progressive", stats: "End: 3, Str: 3, Int: 3, Pre: 3", desc: "Increases attributes: End: 3, Str: 3, Int: 3, Pre: 3" },
-    { id: "t_sniper_training", name: "Sniper Training", type: "progressive", stats: "End: 3, Dex: 3, Ego: 3, Pre: 3", desc: "Increases attributes: End: 3, Dex: 3, Ego: 3, Pre: 3" },
-    { id: "t_command_training", name: "Command Training", type: "progressive", stats: "Int: 3, Ego: 3, Pre: 3, Rec: 3", desc: "Increases attributes: Int: 3, Ego: 3, Pre: 3, Rec: 3" },
-    { id: "t_survival_training", name: "Survival Training", type: "progressive", stats: "Con: 3, End: 2, Dex: 3, Pre: 3, Rec: 2", desc: "Increases attributes: Con: 3, End: 2, Dex: 3, Pre: 3, Rec: 2" },
-    { id: "t_field_ops_training", name: "Field Ops Training", type: "progressive", stats: "Con: 3, End: 2, Int: 3, Ego: 3, Rec: 2", desc: "Increases attributes: Con: 3, End: 2, Int: 3, Ego: 3, Rec: 2" },
-    { id: "t_jack_of_all_trades", name: "Jack of All Trades", type: "progressive", stats: "All: 2", desc: "Increases attributes: All: 2" }
+	{ id: "t_sureshot", name: "Sureshot", type: "innate", stats: "Dex: 12, Int: 12", desc: "Your hand-eye coordination is unmatched.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_abyssal", name: "Abyssal", type: "innate", stats: "Con: 12, End: 12", desc: "You draw your power from dark places.<br />Con: 12, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_energized", name: "Energized", type: "innate", stats: "End: 12, Rec: 12", desc: "The power flows through you.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
+	{ id: "t_incandescent", name: "Incandescent", type: "innate", stats: "Pre: 12, Rec: 12", desc: "A fire burns deep within you.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 12, Rec: 12" },
+	{ id: "t_impetus", name: "Impetus", type: "innate", stats: "End: 12, Ego: 12", desc: "Your power is unstoppable.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
+	{ id: "t_tech_savvy", name: "Tech Savvy", type: "innate", stats: "End: 12, Int: 12", desc: "You know what makes things tick.<br />Con: 5, End: 12, Str: 5, Dex: 5, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_absolute_zero", name: "Absolute Zero", type: "innate", stats: "Dex: 12, Rec: 12", desc: "You have a cold outlook on life.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
+	{ id: "t_one_of_mind_and_body", name: "One of Mind and Body", type: "innate", stats: "Str: 12, Dex: 12", desc: "You have achieved the balance.<br />Con: 5, End: 5, Str: 12, Dex: 12, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_superhuman", name: "Superhuman", type: "innate", stats: "Con: 12, Str: 12", desc: "You have the strength of many.<br />Con: 12, End: 5, Str: 12, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_quick_trigger", name: "Quick Trigger", type: "innate", stats: "Dex: 12, Ego: 12", desc: "You are fast on the draw.<br />Con: 5, End: 5, Str: 5, Dex: 12, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
+	{ id: "t_mechanized", name: "Mechanized", type: "innate", stats: "Str: 12, Int: 12", desc: "You know how to maximize efficiency.<br />Con: 5, End: 5, Str: 12, Dex: 5, Int: 12, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_arcanus", name: "Arcanus", type: "innate", stats: "Int: 12, Pre: 12", desc: "You have an intuitive grasp of magic.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 12, Ego: 5, Pre: 12, Rec: 5" },
+	{ id: "t_inhuman", name: "Inhuman", type: "innate", stats: "Con: 12, Rec: 12", desc: "You have an unspeakable heritage.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
+	{ id: "t_matter_manipulator", name: "Matter Manipulator", type: "innate", stats: "Con: 12, Ego: 12", desc: "You know what it takes to get things moving.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 5, Rec: 5" },
+	{ id: "t_mind_over_matter", name: "Mind over Matter", type: "innate", stats: "Ego: 12, Pre: 12", desc: "You know what motivates people.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 12, Pre: 12, Rec: 5" },
+	{ id: "t_the_hero", name: "The Hero", type: "innate", stats: "Con: 8, End: 6, Str: 8, Dex: 8, Int: 8, Ego: 8, Pre: 8, Rec: 6", desc: "The picture of balanced perfection, this character is the Jack-of-All-Trades, master of none, though often better than the master of one.<br />Con: 8, End: 6, Str: 8, Dex: 8, Int: 8, Ego: 8, Pre: 8, Rec: 6" },
+	{ id: "t_divinity", name: "Divinity", type: "innate", stats: "Con: 12, Pre: 12", desc: "You have been inspired by forces beyond.<br />Con: 12, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 5, Pre: 12, Rec: 5" },
+	{ id: "t_feral", name: "Feral", type: "innate", stats: "Str: 12, Rec: 12", desc: "Within you beats the heart of an animal.<br />Con: 5, End: 5, Str: 12, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 12" },
+	{ id: "t_the_inferno", name: "The Inferno", type: "innate", stats: "End: 10, Dex: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Inferno.<br />Con: 5, End: 10, Str: 5, Dex: 10, Int: 5, Ego: 8, Pre: 5, Rec: 10" },
+	{ id: "t_the_soldier", name: "The Soldier", type: "innate", stats: "Dex: 10, Int: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Soldier.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_blade", name: "The Blade", type: "innate", stats: "End: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Blade.<br />Con: 5, End: 8, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_savage", name: "The Savage", type: "innate", stats: "Con: 10, Str: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Brute.<br />Con: 10, End: 5, Str: 10, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_behemoth", name: "The Behemoth", type: "innate", stats: "Con: 10, End: 8, Str: 10, Rec: 10", desc: "This is the innate characteristic for The Behemoth.<br />Con: 10, End: 8, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_glacier", name: "The Glacier", type: "innate", stats: "Con: 10, End: 10, Dex: 8, Int: 10", desc: "This is the innate characteristic for The Glacier.<br />Con: 10, End: 10, Str: 5, Dex: 8, Int: 10, Ego: 5, Pre: 5, Rec: 5" },
+	{ id: "t_the_mind", name: "The Mind", type: "innate", stats: "End: 10, Int: 8, Ego: 10, Pre: 10", desc: "This is the innate characteristic for The Mind.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 8, Ego: 10, Pre: 10, Rec: 5" },
+	{ id: "t_the_grimoire", name: "The Grimoire", type: "innate", stats: "Int: 10, Ego: 10, Pre: 10, Rec: 8", desc: "This is the innate characteristic for The Grimoire.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 8" },
+	{ id: "t_the_assassin", name: "The Assassin", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Ego: 10", desc: "This is the innate characteristic for The Assassin.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_marksman", name: "The Marksman", type: "innate", stats: "End: 8, Dex: 10, Int: 10, Ego: 10", desc: "This is the innate characteristic for The Marksman.<br />Con: 5, End: 8, Str: 5, Dex: 10, Int: 10, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_void", name: "The Void", type: "innate", stats: "Con: 10, End: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Void.<br />Con: 10, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_inventor", name: "The Inventor", type: "innate", stats: "End: 8, Int: 10, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Inventor.<br />Con: 5, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 5, Pre: 10, Rec: 10" },
+	{ id: "t_the_tempest", name: "The Tempest", type: "innate", stats: "End: 10, Dex: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Tempest.<br />Con: 5, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_devastator", name: "The Devastator", type: "innate", stats: "Con: 10, End: 8, Str: 10, Rec: 10", desc: "This is the innate characteristic for The Devastator.<br />Con: 10, End: 8, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_disciple", name: "The Disciple", type: "innate", stats: "Dex: 10, Int: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Disciple.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_impulse", name: "The Impulse", type: "innate", stats: "End: 10, Int: 10, Ego: 10, Rec: 8", desc: "This is the innate characteristic for The Impulse.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 5, Rec: 8" },
+	{ id: "t_the_fist", name: "The Fist", type: "innate", stats: "Str: 10, Dex: 10, Int: 10, Rec: 8", desc: "This is the innate characteristic for The Fist.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 10, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_protector", name: "The Protector", type: "innate", stats: "Con: 10, Str: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Master.<br />Con: 10, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_scourge", name: "The Scourge", type: "innate", stats: "Con: 10, End: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Scourge and The Cursed.<br />Con: 10, End: 8, Str: 5, Dex: 5, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_squall", name: "The Squall", type: "innate", stats: "End: 10, Dex: 8, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Squall.<br />Con: 5, End: 10, Str: 5, Dex: 8, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_mountain", name: "The Mountain", type: "innate", stats: "Con: 10, End: 10, Str: 8, Ego: 10", desc: "This is the innate characteristic for The Mountain.<br />Con: 10, End: 10, Str: 8, Dex: 5, Int: 5, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_unleashed", name: "The Unleashed", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Rec: 10", desc: "This is the innate characteristic for The Unleashed.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_radiant", name: "The Radiant", type: "innate", stats: "Int: 10, Ego: 10, Pre: 10, Rec: 8", desc: "This is the innate characteristic for The Radiant.<br />Con: 5, End: 5, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 8" },
+	{ id: "t_the_invincible", name: "The Invincible", type: "innate", stats: "Con: 10, End: 10, Int: 10, Ego: 8", desc: "This is the innate characteristic for The Invincible.<br />Con: 10, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 8, Pre: 5, Rec: 5" },
+	{ id: "t_the_night_avenger", name: "The Night Avenger", type: "innate", stats: "End: 8, Str: 10, Dex: 10, Ego: 10", desc: "This is the innate characteristic for The Night Avenger.<br />Con: 5, End: 8, Str: 10, Dex: 10, Int: 5, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_chiller", name: "The Chiller", type: "innate", stats: "Con: 10, End: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Chiller.<br />Con: 10, End: 10, Str: 5, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_rockstar", name: "The Rockstar", type: "innate", stats: "Con: 10, End: 10, Str: 10, Rec: 8", desc: "This is the innate characteristic for The Rockstar.<br />Con: 10, End: 10, Str: 10, Dex: 5, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_predator", name: "The Predator", type: "innate", stats: "Con: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Predator.<br />Con: 8, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_penitent", name: "The Penitent", type: "innate", stats: "End: 10, Str: 10, Dex: 10, Rec: 8", desc: "This is the innate characteristic for The Penitent.<br />Con: 5, End: 10, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_hexslinger", name: "The Hexslinger", type: "innate", stats: "Dex: 10, Int: 10, Ego: 10, Pre: 8", desc: "This is the innate characteristic for The Hexslinger.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 10, Ego: 10, Pre: 8, Rec: 5" },
+	{ id: "t_the_witch", name: "The Witch", type: "innate", stats: "Con: 10, Int: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Witch.<br />Con: 10, End: 5, Str: 5, Dex: 5, Int: 8, Ego: 5, Pre: 10, Rec: 10" },
+	{ id: "t_the_automaton", name: "The Automaton", type: "innate", stats: "Con: 10, End: 8, Int: 10, Ego: 10", desc: "This is the innate characteristic for The Automaton.<br />Con: 10, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_cybernetic_warrior", name: "The Cybernetic Warrior", type: "innate", stats: "Con: 10, End: 10, Int: 10, Rec: 8", desc: "This is the innate characteristic for The Cybernetic Warrior.<br />Con: 10, End: 10, Str: 5, Dex: 5, Int: 10, Ego: 5, Pre: 5, Rec: 8" },
+	{ id: "t_the_gunslinger", name: "The Gunslinger", type: "innate", stats: "Con: 10, Dex: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Gunslinger.<br />Con: 10, End: 5, Str: 5, Dex: 10, Int: 5, Ego: 8, Pre: 5, Rec: 10" },
+	{ id: "t_the_specialist", name: "The Specialist", type: "innate", stats: "Con: 10, Dex: 10, Int: 8, Rec: 10", desc: "This is the innate characteristic for The Specialist.<br />Con: 10, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_psychokinetic", name: "The Psychokinetic", type: "innate", stats: "End: 8, Dex: 10, Ego: 10, Rec: 10", desc: "This is the innate characteristic for The Psychokinetic.<br />Con: 5, End: 8, Str: 5, Dex: 10, Int: 5, Ego: 10, Pre: 5, Rec: 10" },
+	{ id: "t_the_blazing", name: "The Blazing", type: "innate", stats: "End: 10, Ego: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Blazing.<br />Con: 5, End: 10, Str: 5, Dex: 5, Int: 5, Ego: 8, Pre: 10, Rec: 10" },
+	{ id: "t_the_dragon", name: "The Dragon", type: "innate", stats: "Con: 8, Str: 10, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Dragon.<br />Con: 8, End: 5, Str: 10, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_master", name: "The Master", type: "innate", stats: "Con: 10, Str: 8, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Master.<br />Con: 10, End: 5, Str: 8, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_samurai", name: "The Samurai", type: "innate", stats: "Con: 10, End: 8, Dex: 10, Rec: 10", desc: "This is the innate characteristic for The Samurai.<br />Con: 10, End: 8, Str: 5, Dex: 10, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_midnight", name: "The Midnight", type: "innate", stats: "Dex: 10, Int: 8, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Midnight.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 8, Ego: 5, Pre: 10, Rec: 10" },
+	{ id: "t_the_wrecker", name: "The Wrecker", type: "innate", stats: "Con: 10, Str: 10, Dex: 8, Rec: 10", desc: "This is the innate characteristic for The Wrecker.<br />Con: 10, End: 5, Str: 10, Dex: 8, Int: 5, Ego: 5, Pre: 5, Rec: 10" },
+	{ id: "t_the_tenebrous", name: "The Tenebrous", type: "innate", stats: "Con: 8, Ego: 10, Pre: 10, Rec: 10", desc: "This is the innate characteristic for The Tenebrous.<br />Con: 8, End: 5, Str: 5, Dex: 5, Int: 5, Ego: 10, Pre: 10, Rec: 10" },
+	{ id: "t_the_combatant", name: "The Combatant", type: "innate", stats: "Str: 10, Dex: 10, Int: 8, Ego: 10", desc: "This is the innate characteristic for The Combatant.<br />Con: 5, End: 5, Str: 10, Dex: 10, Int: 8, Ego: 10, Pre: 5, Rec: 5" },
+	{ id: "t_the_fissile", name: "The Fissile", type: "innate", stats: "Dex: 10, Int: 10, Ego: 8, Rec: 10", desc: "This is the innate characteristic for The Fissile.<br />Con: 5, End: 5, Str: 5, Dex: 10, Int: 10, Ego: 8, Pre: 5, Rec: 10" },
+	{ id: "t_the_overseer", name: "The Overseer", type: "innate", stats: "End: 8, Int: 10, Ego: 10, Pre: 10", desc: "This is the innate characteristic for The Overseer.<br />Con: 5, End: 8, Str: 5, Dex: 5, Int: 10, Ego: 10, Pre: 10, Rec: 5" },
+	{ id: "t_mighty", name: "Mighty", type: "progressive", stats: "Str: 8", desc: "Increases attributes: Str: 8" },
+	{ id: "t_agile", name: "Agile", type: "progressive", stats: "Dex: 8", desc: "Increases attributes: Dex: 8" },
+	{ id: "t_enduring", name: "Enduring", type: "progressive", stats: "Con: 8", desc: "Increases attributes: Con: 8" },
+	{ id: "t_brilliant", name: "Brilliant", type: "progressive", stats: "Int: 8", desc: "Increases attributes: Int: 8" },
+	{ id: "t_indomitable", name: "Indomitable", type: "progressive", stats: "Ego: 8", desc: "Increases attributes: Ego: 8" },
+	{ id: "t_intimidating", name: "Intimidating", type: "progressive", stats: "Pre: 8", desc: "Increases attributes: Pre: 8" },
+	{ id: "t_tireless", name: "Tireless", type: "progressive", stats: "Rec: 8", desc: "Increases attributes: Rec: 8" },
+	{ id: "t_energetic", name: "Energetic", type: "progressive", stats: "End: 8", desc: "Increases attributes: End: 8" },
+	{ id: "t_martial_focus", name: "Martial Focus", type: "progressive", stats: "Str: 5, Dex: 5", desc: "Increases attributes: Str: 5, Dex: 5" },
+	{ id: "t_physical_conditioning", name: "Physical Conditioning", type: "progressive", stats: "Str: 5, Con: 5", desc: "Increases attributes: Str: 5, Con: 5" },
+	{ id: "t_body_and_mind", name: "Body and Mind", type: "progressive", stats: "Str: 5, Int: 5", desc: "Increases attributes: Str: 5, Int: 5" },
+	{ id: "t_professional_athlete", name: "Professional Athlete", type: "progressive", stats: "Str: 5, Ego: 5", desc: "Increases attributes: Str: 5, Ego: 5" },
+	{ id: "t_impressive_physique", name: "Impressive Physique", type: "progressive", stats: "Str: 5, Pre: 5", desc: "Increases attributes: Str: 5, Pre: 5" },
+	{ id: "t_relentless", name: "Relentless", type: "progressive", stats: "Str: 5, Rec: 5", desc: "Increases attributes: Str: 5, Rec: 5" },
+	{ id: "t_bodybuilder", name: "Bodybuilder", type: "progressive", stats: "Str: 5, End: 5", desc: "Increases attributes: Str: 5, End: 5" },
+	{ id: "t_acrobat", name: "Acrobat", type: "progressive", stats: "Dex: 5, Con: 5", desc: "Increases attributes: Dex: 5, Con: 5" },
+	{ id: "t_coordinated", name: "Coordinated", type: "progressive", stats: "Dex: 5, Int: 5", desc: "Increases attributes: Dex: 5, Int: 5" },
+	{ id: "t_shooter", name: "Shooter", type: "progressive", stats: "Dex: 5, Ego: 5", desc: "Increases attributes: Dex: 5, Ego: 5" },
+	{ id: "t_finesse", name: "Finesse", type: "progressive", stats: "Dex: 5, Pre: 5", desc: "Increases attributes: Dex: 5, Pre: 5" },
+	{ id: "t_impresario", name: "Impresario", type: "progressive", stats: "Dex: 5, Rec: 5", desc: "Increases attributes: Dex: 5, Rec: 5" },
+	{ id: "t_accurate", name: "Accurate", type: "progressive", stats: "Dex: 5, End: 5", desc: "Increases attributes: Dex: 5, End: 5" },
+	{ id: "t_healthy_mind", name: "Healthy Mind", type: "progressive", stats: "Con: 5, Int: 5", desc: "Increases attributes: Con: 5, Int: 5" },
+	{ id: "t_ascetic", name: "Ascetic", type: "progressive", stats: "Con: 5, Ego: 5", desc: "Increases attributes: Con: 5, Ego: 5" },
+	{ id: "t_shrug_it_off", name: "Shrug It Off", type: "progressive", stats: "Con: 5, Pre: 5", desc: "Increases attributes: Con: 5, Pre: 5" },
+	{ id: "t_quick_recovery", name: "Quick Recovery", type: "progressive", stats: "Con: 5, Rec: 5", desc: "Increases attributes: Con: 5, Rec: 5" },
+	{ id: "t_boundless_reserves", name: "Boundless Reserves", type: "progressive", stats: "Con: 5, End: 5", desc: "Increases attributes: Con: 5, End: 5" },
+	{ id: "t_academics", name: "Academics", type: "progressive", stats: "Int: 5, Ego: 5", desc: "Increases attributes: Int: 5, Ego: 5" },
+	{ id: "t_diplomatic", name: "Diplomatic", type: "progressive", stats: "Int: 5, Pre: 5", desc: "Increases attributes: Int: 5, Pre: 5" },
+	{ id: "t_negotiator", name: "Negotiator", type: "progressive", stats: "Int: 5, Rec: 5", desc: "Increases attributes: Int: 5, Rec: 5" },
+	{ id: "t_investigator", name: "Investigator", type: "progressive", stats: "Int: 5, End: 5", desc: "Increases attributes: Int: 5, End: 5" },
+	{ id: "t_showmanship", name: "Showmanship", type: "progressive", stats: "Ego: 5, Pre: 5", desc: "Increases attributes: Ego: 5, Pre: 5" },
+	{ id: "t_worldly", name: "Worldly", type: "progressive", stats: "Ego: 5, Rec: 5", desc: "Increases attributes: Ego: 5, Rec: 5" },
+	{ id: "t_daredevil", name: "Daredevil", type: "progressive", stats: "Ego: 5, End: 5", desc: "Increases attributes: Ego: 5, End: 5" },
+	{ id: "t_lasting_impression", name: "Lasting Impression", type: "progressive", stats: "Pre: 5, Rec: 5", desc: "Increases attributes: Pre: 5, Rec: 5" },
+	{ id: "t_prodigy", name: "Prodigy", type: "progressive", stats: "Pre: 5, End: 5", desc: "Increases attributes: Pre: 5, End: 5" },
+	{ id: "t_amazing_stamina", name: "Amazing Stamina", type: "progressive", stats: "Rec: 5, End: 5", desc: "Increases attributes: Rec: 5, End: 5" },
+	{ id: "t_covert_ops_training", name: "Covert Ops Training", type: "progressive", stats: "Con: 3, Str: 3, Dex: 3, Int: 3", desc: "Increases attributes: Con: 3, Str: 3, Dex: 3, Int: 3" },
+	{ id: "t_martial_training", name: "Martial Training", type: "progressive", stats: "Str: 3, Dex: 3, Ego: 3, Rec: 3", desc: "Increases attributes: Str: 3, Dex: 3, Ego: 3, Rec: 3" },
+	{ id: "t_paramilitary_training", name: "Paramilitary Training", type: "progressive", stats: "Con: 3, End: 3, Str: 3, Rec: 3", desc: "Increases attributes: Con: 3, End: 3, Str: 3, Rec: 3" },
+	{ id: "t_discipline_training", name: "Discipline Training", type: "progressive", stats: "End: 3, Str: 3, Int: 3, Pre: 3", desc: "Increases attributes: End: 3, Str: 3, Int: 3, Pre: 3" },
+	{ id: "t_sniper_training", name: "Sniper Training", type: "progressive", stats: "End: 3, Dex: 3, Ego: 3, Pre: 3", desc: "Increases attributes: End: 3, Dex: 3, Ego: 3, Pre: 3" },
+	{ id: "t_command_training", name: "Command Training", type: "progressive", stats: "Int: 3, Ego: 3, Pre: 3, Rec: 3", desc: "Increases attributes: Int: 3, Ego: 3, Pre: 3, Rec: 3" },
+	{ id: "t_survival_training", name: "Survival Training", type: "progressive", stats: "Con: 3, End: 2, Dex: 3, Pre: 3, Rec: 2", desc: "Increases attributes: Con: 3, End: 2, Dex: 3, Pre: 3, Rec: 2" },
+	{ id: "t_field_ops_training", name: "Field Ops Training", type: "progressive", stats: "Con: 3, End: 2, Int: 3, Ego: 3, Rec: 2", desc: "Increases attributes: Con: 3, End: 2, Int: 3, Ego: 3, Rec: 2" },
+	{ id: "t_jack_of_all_trades", name: "Jack of All Trades", type: "progressive", stats: "All: 2", desc: "Increases attributes: All: 2" }
 ];
 
 let currentTalentSlot = null;
 
 if (!document.getElementById('talent-selection-modal')) {
-    let tModalHtml = `
-    <div id="talent-selection-modal" class="floating-window" style="display:none; width: 900px; max-height: 80vh; overflow-y: auto; padding: 0;">
-        <div class="modal-header" style="position: sticky; top: 0; background: #1e1e1e; z-index: 100; padding: 20px 25px; border-bottom: 2px solid #333; margin: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
-            <h3 style="margin: 0; font-size: 36px; color:#4DA8DA;">Select Character Talent</h3>
-            <span class="close-btn" onclick="closeTalentSelectionModal()" style="font-size: 40px; line-height: 1;">&times;</span>
-        </div>
-        <div id="talent-selection-content" style="padding: 25px;"></div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', tModalHtml);
+	let tModalHtml = `
+	<div id="talent-selection-modal" class="floating-window" style="display:none; width: 900px; max-height: 80vh; overflow-y: auto; padding: 0;">
+		<div class="modal-header" style="position: sticky; top: 0; background: #1e1e1e; z-index: 100; padding: 20px 25px; border-bottom: 2px solid #333; margin: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
+			<h3 style="margin: 0; font-size: 36px; color:#4DA8DA;">Select Character Talent</h3>
+			<span class="close-btn" onclick="closeTalentSelectionModal()" style="font-size: 40px; line-height: 1;">&times;</span>
+		</div>
+		<div id="talent-selection-content" style="padding: 25px;"></div>
+	</div>`;
+	document.body.insertAdjacentHTML('beforeend', tModalHtml);
 }
 
 window.openTalentSelectionModal = function(slotIndex) {
-    currentTalentSlot = slotIndex;
-    document.getElementById('talent-selection-modal').style.display = 'block';
-    renderTalentSelectionModal();
+	currentTalentSlot = slotIndex;
+	document.getElementById('talent-selection-modal').style.display = 'block';
+	renderTalentSelectionModal();
 }
 
 window.closeTalentSelectionModal = function() {
-    currentTalentSlot = null;
-    document.getElementById('talent-selection-modal').style.display = 'none';
-    render();
+	currentTalentSlot = null;
+	document.getElementById('talent-selection-modal').style.display = 'none';
+	render();
 }
 
 window.setTalentForSlot = function(talentId) {
-    if (currentTalentSlot !== null) {
-        if (!build.talents) build.talents = new Array(7).fill(null);
-        build.talents[currentTalentSlot] = talentId === 'none' ? null : talentId;
-        closeTalentSelectionModal();
-    }
+	if (currentTalentSlot !== null) {
+		if (!build.talents) build.talents = new Array(7).fill(null);
+		build.talents[currentTalentSlot] = talentId === 'none' ? null : talentId;
+		closeTalentSelectionModal();
+	}
 }
 
 function renderTalentSelectionModal() {
-    let content = document.getElementById('talent-selection-content');
-    let html = `<div style="margin-bottom: 20px;"><button class="big-tree-btn" style="color:white; border-color:#ff5555; font-size: 20px;" onclick="setTalentForSlot('none')">Clear Slot</button></div>`;
-    
-    html += `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: start; gap: 15px;">`;
-    
-    // Rule Enforcement: Enforce Innate on level 1 slot, Progressive on levels 6-21 tracks
-    let targetType = (currentTalentSlot === 0) ? "innate" : "progressive";
-    
-    CO_TALENTS.forEach(t => {
-        if (t.type !== targetType) return; // Drop everything else out of view
-        
-        let isSelected = build.talents && build.talents.includes(t.id);
-        let selectedStyle = isSelected ? `border-color: #4DA8DA; background: rgba(77, 168, 218, 0.1);` : ``;
-        
-        // Formats tooltips cleanly, substituting old source <br /> breaks with newline spaces
-        let plainTooltipDesc = t.desc.replace(/<br\s*\/?>/gi, '\n');
-        
-        // REDUCED: Dropped padding from 15px to 6px/10px, min-height from 75px to 46px
-        html += `
-        <div class="power" style="${selectedStyle} padding: 6px 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 46px; border-radius: 4px; cursor: pointer;" onclick="setTalentForSlot('${t.id}')" title="${plainTooltipDesc}">
-            <div class="name" style="font-size: 14px; font-weight: bold; color: #4DA8DA; text-shadow: 1px 1px 2px #000; line-height: 1.2;">${t.name}</div>
-            <div style="font-size: 11px; color: #888; margin-top: 2px; font-family: monospace;">${t.stats}</div>
-        </div>`;
-    });
-    
-    html += `</div>`;
-    content.innerHTML = html;
+	let content = document.getElementById('talent-selection-content');
+	let html = `<div style="margin-bottom: 20px;"><button class="big-tree-btn" style="color:white; border-color:#ff5555; font-size: 20px;" onclick="setTalentForSlot('none')">Clear Slot</button></div>`;
+
+	html += `<div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); align-items: start; gap: 15px;">`;
+
+	// Rule Enforcement: Enforce Innate on level 1 slot, Progressive on levels 6-21 tracks
+	let targetType = (currentTalentSlot === 0) ? "innate" : "progressive";
+
+	CO_TALENTS.forEach(t => {
+		if (t.type !== targetType) return; // Drop everything else out of view
+
+		let isSelected = build.talents && build.talents.includes(t.id);
+		let selectedStyle = isSelected ? `border-color: #4DA8DA; background: rgba(77, 168, 218, 0.1);` : ``;
+
+		// Formats tooltips cleanly, substituting old source <br /> breaks with newline spaces
+		let plainTooltipDesc = t.desc.replace(/<br\s*\/?>/gi, '\n');
+
+		// REDUCED: Dropped padding from 15px to 6px/10px, min-height from 75px to 46px
+		html += `
+		<div class="power" style="${selectedStyle} padding: 6px 10px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 46px; border-radius: 4px; cursor: pointer;" onclick="setTalentForSlot('${t.id}')" title="${plainTooltipDesc}">
+			<div class="name" style="font-size: 14px; font-weight: bold; color: #4DA8DA; text-shadow: 1px 1px 2px #000; line-height: 1.2;">${t.name}</div>
+			<div style="font-size: 11px; color: #888; margin-top: 2px; font-family: monospace;">${t.stats}</div>
+		</div>`;
+	});
+
+	html += `</div>`;
+	content.innerHTML = html;
 }
 
 
@@ -1146,261 +1146,261 @@ function renderPerkModal() {
 }
 
 function renderSpecsHUD() {
-    let hud = document.getElementById('active-specs-hud');
-    if (!hud) return;
-    
-    hud.style.position = 'relative'; 
+	let hud = document.getElementById('active-specs-hud');
+	if (!hud) return;
 
-    // --- ATTRIBUTES RENDER ---
-    let statHtml = '';
-    let statCats = [
-        { key: "primary", label: "Primary Stat" },
-        { key: "sec1", label: "Secondary Stat 1" },
-        { key: "sec2", label: "Secondary Stat 2" }
-    ];
-    
-    statCats.forEach(cat => {
-        let sVal = build.stats[cat.key];
-        if (sVal) {
-            let colorHex = STAT_COLORS[sVal] || '#ffeb3b';
-            statHtml += `<div class="hud-row" style="margin-bottom:8px; white-space: nowrap;"><div class="hud-stat" onclick="openStatSelectionModal('${cat.key}')" style="color: ${colorHex}; text-shadow: 2px 2px 4px #000; cursor: pointer; font-size: 20px; font-weight: bold; white-space: nowrap;">${cat.label}: ${sVal}</div></div>`;
-        } else {
-            statHtml += `<div class="hud-row" style="margin-bottom:8px; white-space: nowrap;"><div class="hud-stat empty" onclick="openStatSelectionModal('${cat.key}')" style="color: #666; cursor: pointer; font-size: 20px; font-style: italic; white-space: nowrap;">${cat.label}</div></div>`;
-        }
-    });
+	hud.style.position = 'relative';
 
-    // --- CO INNATE & PROGRESSIVE TALENTS RENDER ---
-    let talentsLabels = ["Innate (L1)", "Talent (L6)", "Talent (L9)", "Talent (L12)", "Talent (L15)", "Talent (L18)", "Talent (L21)"];
-    let talentsHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
+	// --- ATTRIBUTES RENDER ---
+	let statHtml = '';
+	let statCats = [
+		{ key: "primary", label: "Primary Stat" },
+		{ key: "sec1", label: "Secondary Stat 1" },
+		{ key: "sec2", label: "Secondary Stat 2" }
+	];
 
-    for(let i = 0; i < 7; i++) {
-        let tId = build.talents ? build.talents[i] : null;
-        if (tId !== null) {
-            let tObj = CO_TALENTS.find(t => t.id === tId);
-            if (tObj) {
-                let plainTooltipDesc = tObj.desc.replace(/<br\s*\/?>/gi, '\n');
-                talentsHtml += `
-                <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openTalentSelectionModal(${i})" title="${plainTooltipDesc}">
-                    <span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">${tObj.name}</span>
-                </div>`;
-            }
-        } else {
-            talentsHtml += `
-            <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openTalentSelectionModal(${i})">
-                <span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">${talentsLabels[i]}</span>
-            </div>`;
-        }
-    }
-    talentsHtml += `</div>`;
+	statCats.forEach(cat => {
+		let sVal = build.stats[cat.key];
+		if (sVal) {
+			let colorHex = STAT_COLORS[sVal] || '#ffeb3b';
+			statHtml += `<div class="hud-row" style="margin-bottom:8px; white-space: nowrap;"><div class="hud-stat" onclick="openStatSelectionModal('${cat.key}')" style="color: ${colorHex}; text-shadow: 2px 2px 4px #000; cursor: pointer; font-size: 20px; font-weight: bold; white-space: nowrap;">${cat.label}: ${sVal}</div></div>`;
+		} else {
+			statHtml += `<div class="hud-row" style="margin-bottom:8px; white-space: nowrap;"><div class="hud-stat empty" onclick="openStatSelectionModal('${cat.key}')" style="color: #666; cursor: pointer; font-size: 20px; font-style: italic; white-space: nowrap;">${cat.label}</div></div>`;
+		}
+	});
 
-    // --- POWER VARIANTS RENDER ---
-    let variantsHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
-    for(let i=0; i<5; i++) {
-        let vId = build.variants[i];
-        if (vId !== null) {
-            let vObj = powerVariants.find(v => v.id === vId);
-            if (vObj) {
-                variantsHtml += `
-                <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openVariantSelectionModal(${i})">
-                    <span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;" title="${vObj.name}">${vObj.name}</span>
-                </div>`;
-            }
-        } else {
-            variantsHtml += `
-            <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openVariantSelectionModal(${i})">
-                <span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">Empty Variant</span>
-            </div>`;
-        }
-    }
-    variantsHtml += `</div>`;
+	// --- CO INNATE & PROGRESSIVE TALENTS RENDER ---
+	let talentsLabels = ["Innate (L1)", "Talent (L6)", "Talent (L9)", "Talent (L12)", "Talent (L15)", "Talent (L18)", "Talent (L21)"];
+	let talentsHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
 
-    // --- DEVICES RENDER ---
-    let deviceHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
-    for(let i=0; i<5; i++) {
-        let dId = build.devices[i];
-        if (dId !== null) {
-            let dObj = devices.find(d => d.id === dId);
-            if (dObj) {
-                deviceHtml += `
-                <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openDeviceSelectionModal(${i})">
-                    <span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;" title="${dObj.name}">${dObj.name}</span>
-                </div>`;
-            }
-        } else {
-            deviceHtml += `
-            <div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openDeviceSelectionModal(${i})">
-                <span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">Empty Device</span>
-            </div>`;
-        }
-    }
-    deviceHtml += `</div>`;
+	for(let i = 0; i < 7; i++) {
+		let tId = build.talents ? build.talents[i] : null;
+		if (tId !== null) {
+			let tObj = CO_TALENTS.find(t => t.id === tId);
+			if (tObj) {
+				let plainTooltipDesc = tObj.desc.replace(/<br\s*\/?>/gi, '\n');
+				talentsHtml += `
+				<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openTalentSelectionModal(${i})" title="${plainTooltipDesc}">
+					<span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">${tObj.name}</span>
+				</div>`;
+			}
+		} else {
+			talentsHtml += `
+			<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openTalentSelectionModal(${i})">
+				<span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">${talentsLabels[i]}</span>
+			</div>`;
+		}
+	}
+	talentsHtml += `</div>`;
 
-    // --- C.A.M.S. & ADVANTAGES RADAR RENDER ---
-    let globalAdvPoints = getTotalAdvantagePoints();
-    let maxAdv = 36 + (build.cams ? build.cams.level : 0);
-    let counterLabelColor = globalAdvPoints === maxAdv ? "#ff5555" : "rgba(255,255,255,0.4)";
-    let counterValueColor = globalAdvPoints === maxAdv ? "#ff5555" : "rgba(255,255,255,0.8)";
+	// --- POWER VARIANTS RENDER ---
+	let variantsHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
+	for(let i=0; i<5; i++) {
+		let vId = build.variants[i];
+		if (vId !== null) {
+			let vObj = powerVariants.find(v => v.id === vId);
+			if (vObj) {
+				variantsHtml += `
+				<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openVariantSelectionModal(${i})">
+					<span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;" title="${vObj.name}">${vObj.name}</span>
+				</div>`;
+			}
+		} else {
+			variantsHtml += `
+			<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openVariantSelectionModal(${i})">
+				<span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">Empty Variant</span>
+			</div>`;
+		}
+	}
+	variantsHtml += `</div>`;
 
-    let camsPolarity = build.cams ? build.cams.polarity : 'Blue';
-    let camsLevel = build.cams ? build.cams.level : 0;
-    let camsColor = camsPolarity === 'Blue' ? '#4DA8DA' : '#4CAF50';
+	// --- DEVICES RENDER ---
+	let deviceHtml = `<div style="display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 165px; padding-right: 5px;">`;
+	for(let i=0; i<5; i++) {
+		let dId = build.devices[i];
+		if (dId !== null) {
+			let dObj = devices.find(d => d.id === dId);
+			if (dObj) {
+				deviceHtml += `
+				<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; border: 1px solid #444; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(77,168,218,0.1)'; this.style.borderColor='#4DA8DA'" onmouseleave="this.style.background='rgba(0,0,0,0.3)'; this.style.borderColor='#444'" onclick="openDeviceSelectionModal(${i})">
+					<span style="color: #4DA8DA; font-weight: bold; font-size: 14px; text-shadow: 1px 1px 2px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;" title="${dObj.name}">${dObj.name}</span>
+				</div>`;
+			}
+		} else {
+			deviceHtml += `
+			<div class="hud-row" style="display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 4px; border: 1px dashed #555; transition: 0.2s; width: 100%; box-sizing: border-box;" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(0,0,0,0.2)'" onclick="openDeviceSelectionModal(${i})">
+				<span style="color: #666; font-style: italic; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; display: inline-block;">Empty Device</span>
+			</div>`;
+		}
+	}
+	deviceHtml += `</div>`;
 
-    let unifiedSystemsHtml = `
-    <div style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; border: 1px solid #555; min-width: 200px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-right: 6px;">C.A.M.S.</div>
-            <div style="display: flex; gap: 4px;">
-                <select onchange="updateCams('polarity', this.value)" style="background: #111; color: ${camsColor}; border: 1px solid #444; border-radius: 4px; padding: 0px 4px; font-weight: bold; font-size: 12px; cursor: pointer; outline: none;">
-                    <option value="Blue" ${camsPolarity === 'Blue' ? 'selected' : ''} style="color: #4DA8DA;">Blue</option>
-                    <option value="Green" ${camsPolarity === 'Green' ? 'selected' : ''} style="color: #4CAF50;">Green</option>
-                </select>
-                <select onchange="updateCams('level', this.value)" style="background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 0px 4px; font-weight: bold; font-size: 12px; cursor: pointer; outline: none;">
-                    <option value="0" ${camsLevel == 0 ? 'selected' : ''}>Level 0</option>
-                    <option value="1" ${camsLevel == 1 ? 'selected' : ''}>Level 1</option>
-                    <option value="2" ${camsLevel == 2 ? 'selected' : ''}>Level 2</option>
-                    <option value="3" ${camsLevel == 3 ? 'selected' : ''}>Level 3</option>
-                    <option value="4" ${camsLevel == 4 ? 'selected' : ''}>Level 4</option>
-                    <option value="5" ${camsLevel == 5 ? 'selected' : ''}>Level 5</option>
-                </select>
-            </div>
-        </div>
-        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px dashed #444; padding-top: 2px; width: 100%;">
-            <div style="color: ${counterLabelColor}; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Adv. Points</div>
-            <div style="color: ${counterValueColor}; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1;">${globalAdvPoints} / ${maxAdv}</div>
-        </div>
-    </div>`;
+	// --- C.A.M.S. & ADVANTAGES RADAR RENDER ---
+	let globalAdvPoints = getTotalAdvantagePoints();
+	let maxAdv = 36 + (build.cams ? build.cams.level : 0);
+	let counterLabelColor = globalAdvPoints === maxAdv ? "#ff5555" : "rgba(255,255,255,0.4)";
+	let counterValueColor = globalAdvPoints === maxAdv ? "#ff5555" : "rgba(255,255,255,0.8)";
 
-    // --- MASTERY TRACK RENDER ---
-    let masteryHtml = '';
-    if (build.specs.mastery !== null) {
-        let masterNode = null;
-        specializations.forEach(t => { if(t.mastery && t.mastery.id.toString() === build.specs.mastery.toString()) masterNode = t.mastery; });
-        if (masterNode) {
-            masteryHtml = `
-            <div style="background: rgba(255,0,0,0.1); border: 1px solid rgba(255,85,85,0.5); border-radius: 6px; padding: 6px 12px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 176px;" onclick="openTreeSelectionModal('mastery')">
-                <div style="color: #ff5555; font-size: 16px; font-weight: bold; text-shadow: 2px 2px 4px #000; letter-spacing: 0.5px;">MASTERY: ${masterNode.name}</div>
-            </div>`;
-        }
-    } else {
-        masteryHtml = `
-        <div style="background: rgba(0,0,0,0.3); border: 1px dashed #555; border-radius: 6px; padding: 6px 12px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 176px;" onclick="openTreeSelectionModal('mastery')">
-            <div style="color: #666; font-size: 14px; font-style: italic; font-weight: bold; letter-spacing: 0.5px;">MASTERY: NONE</div>
-        </div>`;
-    }
+	let camsPolarity = build.cams ? build.cams.polarity : 'Blue';
+	let camsLevel = build.cams ? build.cams.level : 0;
+	let camsColor = camsPolarity === 'Blue' ? '#4DA8DA' : '#4CAF50';
 
-    // --- SPECIALIZATIONS RENDER ---
-    let specHtml = '';
-    let specCats = [
-        { key: "primary", label: "Primary Tree" },
-        { key: "sec1", label: "Secondary Tree 1" },
-        { key: "sec2", label: "Secondary Tree 2" }
-    ];
+	let unifiedSystemsHtml = `
+	<div style="display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 6px; border: 1px solid #555; min-width: 200px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+		<div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+			<div style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-right: 6px;">C.A.M.S.</div>
+			<div style="display: flex; gap: 4px;">
+				<select onchange="updateCams('polarity', this.value)" style="background: #111; color: ${camsColor}; border: 1px solid #444; border-radius: 4px; padding: 0px 4px; font-weight: bold; font-size: 12px; cursor: pointer; outline: none;">
+					<option value="Blue" ${camsPolarity === 'Blue' ? 'selected' : ''} style="color: #4DA8DA;">Blue</option>
+					<option value="Green" ${camsPolarity === 'Green' ? 'selected' : ''} style="color: #4CAF50;">Green</option>
+				</select>
+				<select onchange="updateCams('level', this.value)" style="background: #111; color: #fff; border: 1px solid #444; border-radius: 4px; padding: 0px 4px; font-weight: bold; font-size: 12px; cursor: pointer; outline: none;">
+					<option value="0" ${camsLevel == 0 ? 'selected' : ''}>Level 0</option>
+					<option value="1" ${camsLevel == 1 ? 'selected' : ''}>Level 1</option>
+					<option value="2" ${camsLevel == 2 ? 'selected' : ''}>Level 2</option>
+					<option value="3" ${camsLevel == 3 ? 'selected' : ''}>Level 3</option>
+					<option value="4" ${camsLevel == 4 ? 'selected' : ''}>Level 4</option>
+					<option value="5" ${camsLevel == 5 ? 'selected' : ''}>Level 5</option>
+				</select>
+			</div>
+		</div>
+		<div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px dashed #444; padding-top: 2px; width: 100%;">
+			<div style="color: ${counterLabelColor}; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Adv. Points</div>
+			<div style="color: ${counterValueColor}; font-size: 18px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); line-height: 1;">${globalAdvPoints} / ${maxAdv}</div>
+		</div>
+	</div>`;
 
-    specCats.forEach((cat, index) => {
-        let tId = build.specs[cat.key];
-        
-        let rightSideInjection = '';
-        if (cat.key === "primary") rightSideInjection = unifiedSystemsHtml; 
-        if (cat.key === "sec1") rightSideInjection = masteryHtml; 
+	// --- MASTERY TRACK RENDER ---
+	let masteryHtml = '';
+	if (build.specs.mastery !== null) {
+		let masterNode = null;
+		specializations.forEach(t => { if(t.mastery && t.mastery.id.toString() === build.specs.mastery.toString()) masterNode = t.mastery; });
+		if (masterNode) {
+			masteryHtml = `
+			<div style="background: rgba(255,0,0,0.1); border: 1px solid rgba(255,85,85,0.5); border-radius: 6px; padding: 6px 12px; flex-shrink: 0; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 176px;" onclick="openTreeSelectionModal('mastery')">
+				<div style="color: #ff5555; font-size: 16px; font-weight: bold; text-shadow: 2px 2px 4px #000; letter-spacing: 0.5px;">MASTERY: ${masterNode.name}</div>
+			</div>`;
+		}
+	} else {
+		masteryHtml = `
+		<div style="background: rgba(0,0,0,0.3); border: 1px dashed #555; border-radius: 6px; padding: 6px 12px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; min-width: 176px;" onclick="openTreeSelectionModal('mastery')">
+			<div style="color: #666; font-size: 14px; font-style: italic; font-weight: bold; letter-spacing: 0.5px;">MASTERY: NONE</div>
+		</div>`;
+	}
 
-        let isLast = index === specCats.length - 1;
-        let borderStyle = isLast ? '' : 'border-bottom: 1px solid rgba(255,255,255,0.05);';
+	// --- SPECIALIZATIONS RENDER ---
+	let specHtml = '';
+	let specCats = [
+		{ key: "primary", label: "Primary Tree" },
+		{ key: "sec1", label: "Secondary Tree 1" },
+		{ key: "sec2", label: "Secondary Tree 2" }
+	];
 
-        if (tId !== null) {
-            let tObj = specializations.find(t => t.id.toString() === tId.toString());
-            if (tObj) {
-                let pts = getSpecTreePoints(tId);
-                let activePerks = tObj.perks.filter(p => build.specs.points[p.id] > 0);
-                
-                let perksHtml = '';
-                activePerks.forEach(p => {
-                    perksHtml += `
-                        <div class="active-perk-icon" style="position: relative; margin-bottom: 4px; cursor: help;">
-                            ${buildSpriteHTML(p, 1.15)}
-                            <div class="active-perk-badge" style="position: absolute; bottom: -5px; right: -5px; background: #000; color: #fff; font-size: 12px; font-weight: bold; width: 20px; height: 20px; line-height: 16px; text-align: center; border-radius: 50%; border: 2px solid #444;">${build.specs.points[p.id]}</div>
-                            <div class="spec-perk-tooltip"><strong style="color:#4DA8DA; font-size:17px;">${p.name}</strong><br><br>${p.desc}</div>
-                        </div>`;
-                });
+	specCats.forEach((cat, index) => {
+		let tId = build.specs[cat.key];
 
-                let sColor = STAT_COLORS[tObj.name] || '#4DA8DA';
-                specHtml += `
-                    <div class="hud-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; padding-bottom: 4px; ${borderStyle} width: 100%;">
-                        <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
-                            <div class="hud-tree" onclick="openPerkModal('${tId}', '${cat.key}')" style="color: ${sColor}; text-shadow: 2px 2px 5px #000; cursor: pointer; font-size: 20px; font-weight: bold; min-width: 150px; padding-top: 3px;">${tObj.name} (${pts}/10)</div>
-                            <div class="hud-perks" style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%;">${perksHtml}</div>
-                        </div>
-                        ${rightSideInjection}
-                    </div>`;
-            }
-        } else {
-            let emptyText = cat.key === "primary" ? "Primary Tree" : `${cat.label}`;
-            specHtml += `
-                <div class="hud-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; padding-bottom: 4px; ${borderStyle} width: 100%;">
-                    <div class="hud-tree empty" onclick="openTreeSelectionModal('${cat.key}')" style="color: #666; cursor: pointer; font-size: 18px; font-style: italic;">${emptyText}</div>
-                    ${rightSideInjection}
-                </div>`;
-        }
-    });
+		let rightSideInjection = '';
+		if (cat.key === "primary") rightSideInjection = unifiedSystemsHtml;
+		if (cat.key === "sec1") rightSideInjection = masteryHtml;
 
-    // --- SHARE PANEL BUILDER ---
-    let shareHtml = `
-    <div class="share-container" style="display: flex; gap: 12px; align-items: center; justify-content: flex-start;">
-        <div class="share-box" style="display: flex; gap: 6px; align-items: center;">
-            <button onclick="exportCode()" style="background: #4DA8DA; color: #000; border: none; padding: 6px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 14px;">COPY BUILD</button>
-            <input type="text" id="export-link" readonly placeholder="Output" style="background: #000; color: #0f0; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 140px; font-size: 12px; font-family: monospace;">
-        </div>
-        <div class="share-box" style="display: flex; gap: 6px; align-items: center;">
-            <input type="text" id="import-code" placeholder="Paste Code" style="background: #000; color: #0f0; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 140px; font-size: 12px; font-family: monospace;">
-            <button onclick="importCode()" style="background: #4DA8DA; color: #000; border: none; padding: 6px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 14px;">LOAD BUILD</button>
-        </div>
-    </div>`;
+		let isLast = index === specCats.length - 1;
+		let borderStyle = isLast ? '' : 'border-bottom: 1px solid rgba(255,255,255,0.05);';
 
-    // --- EXECUTE MASTER LAYOUT INJECTION ---
-    hud.innerHTML = `
-    <div style="display: flex; width: 100%; height: 100%; justify-content: space-between; overflow: visible;">
-        
-        <div style="display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; padding-right: 20px; border-right: 1px dashed #444;">
-            
-            <div style="display: flex; gap: 15px;">
-                <div style="width: 260px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Attributes</h3>
-                    ${statHtml}
-                </div>
-                <div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Talents</h3>
-                    ${talentsHtml}
-                </div>
-                <div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Power Variants</h3>
-                    ${variantsHtml}
-                </div>
-                <div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Devices</h3>
-                    ${deviceHtml}
-                </div>
-            </div>
+		if (tId !== null) {
+			let tObj = specializations.find(t => t.id.toString() === tId.toString());
+			if (tObj) {
+				let pts = getSpecTreePoints(tId);
+				let activePerks = tObj.perks.filter(p => build.specs.points[p.id] > 0);
 
-            <div style="margin-top: auto; padding-top: 20px; padding-bottom: 5px; align-self: flex-start; margin-left: -25px">
-                ${shareHtml}
-            </div>
+				let perksHtml = '';
+				activePerks.forEach(p => {
+					perksHtml += `
+						<div class="active-perk-icon" style="position: relative; margin-bottom: 4px; cursor: help;">
+							${buildSpriteHTML(p, 1.15)}
+							<div class="active-perk-badge" style="position: absolute; bottom: -5px; right: -5px; background: #000; color: #fff; font-size: 12px; font-weight: bold; width: 20px; height: 20px; line-height: 16px; text-align: center; border-radius: 50%; border: 2px solid #444;">${build.specs.points[p.id]}</div>
+							<div class="spec-perk-tooltip"><strong style="color:#4DA8DA; font-size:17px;">${p.name}</strong><br><br>${p.desc}</div>
+						</div>`;
+				});
 
-        </div>
-        
-        <div style="flex: 1; display: flex; flex-direction: column; padding-left: 20px; min-height: 0;">
-            <div style="display: flex; justify-content: flex-start; align-items: flex-end; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 6px; flex-shrink: 0;">
-                <h3 style="margin: 0; color: #888; font-size: 26px;">Specializations</h3>
-            </div>
-            
-            <div style="flex: 1; display: flex; flex-direction: column;">
-                <div style="background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 6px; padding: 10px 15px; display: flex; flex-direction: column; flex-shrink: 0;">
-                    <div style="display: flex; flex-direction: column; flex-shrink: 0;">
-                        ${specHtml}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-    </div>`;
+				let sColor = STAT_COLORS[tObj.name] || '#4DA8DA';
+				specHtml += `
+					<div class="hud-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; padding-bottom: 4px; ${borderStyle} width: 100%;">
+						<div style="display: flex; align-items: flex-start; gap: 10px; flex: 1;">
+							<div class="hud-tree" onclick="openPerkModal('${tId}', '${cat.key}')" style="color: ${sColor}; text-shadow: 2px 2px 5px #000; cursor: pointer; font-size: 20px; font-weight: bold; min-width: 150px; padding-top: 3px;">${tObj.name} (${pts}/10)</div>
+							<div class="hud-perks" style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%;">${perksHtml}</div>
+						</div>
+						${rightSideInjection}
+					</div>`;
+			}
+		} else {
+			let emptyText = cat.key === "primary" ? "Primary Tree" : `${cat.label}`;
+			specHtml += `
+				<div class="hud-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px; padding-bottom: 4px; ${borderStyle} width: 100%;">
+					<div class="hud-tree empty" onclick="openTreeSelectionModal('${cat.key}')" style="color: #666; cursor: pointer; font-size: 18px; font-style: italic;">${emptyText}</div>
+					${rightSideInjection}
+				</div>`;
+		}
+	});
+
+	// --- SHARE PANEL BUILDER ---
+	let shareHtml = `
+	<div class="share-container" style="display: flex; gap: 12px; align-items: center; justify-content: flex-start;">
+		<div class="share-box" style="display: flex; gap: 6px; align-items: center;">
+			<button onclick="exportCode()" style="background: #4DA8DA; color: #000; border: none; padding: 6px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 14px;">COPY BUILD</button>
+			<input type="text" id="export-link" readonly placeholder="Output" style="background: #000; color: #0f0; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 140px; font-size: 12px; font-family: monospace;">
+		</div>
+		<div class="share-box" style="display: flex; gap: 6px; align-items: center;">
+			<input type="text" id="import-code" placeholder="Paste Code" style="background: #000; color: #0f0; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 140px; font-size: 12px; font-family: monospace;">
+			<button onclick="importCode()" style="background: #4DA8DA; color: #000; border: none; padding: 6px 12px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 14px;">LOAD BUILD</button>
+		</div>
+	</div>`;
+
+	// --- EXECUTE MASTER LAYOUT INJECTION ---
+	hud.innerHTML = `
+	<div style="display: flex; width: 100%; height: 100%; justify-content: space-between; overflow: visible;">
+
+		<div style="display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; padding-right: 20px; border-right: 1px dashed #444;">
+
+			<div style="display: flex; gap: 15px;">
+				<div style="width: 260px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+					<h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Attributes</h3>
+					${statHtml}
+				</div>
+				<div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+					<h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Talents</h3>
+					${talentsHtml}
+				</div>
+				<div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+					<h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Power Variants</h3>
+					${variantsHtml}
+				</div>
+				<div style="width: 190px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+					<h3 style="margin-top: 0; margin-bottom: 15px; color: #888; font-size: 26px;">Devices</h3>
+					${deviceHtml}
+				</div>
+			</div>
+
+			<div style="margin-top: auto; padding-top: 20px; padding-bottom: 5px; align-self: flex-start; margin-left: -25px">
+				${shareHtml}
+			</div>
+
+		</div>
+
+		<div style="flex: 1; display: flex; flex-direction: column; padding-left: 20px; min-height: 0;">
+			<div style="display: flex; justify-content: flex-start; align-items: flex-end; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 6px; flex-shrink: 0;">
+				<h3 style="margin: 0; color: #888; font-size: 26px;">Specializations</h3>
+			</div>
+
+			<div style="flex: 1; display: flex; flex-direction: column;">
+				<div style="background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 6px; padding: 10px 15px; display: flex; flex-direction: column; flex-shrink: 0;">
+					<div style="display: flex; flex-direction: column; flex-shrink: 0;">
+						${specHtml}
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>`;
 }
 
 // --- MAIN RENDER ENGINE ---
@@ -1420,79 +1420,79 @@ function render() {
 	if(nextEmpty === -1) nextEmpty = 13;
 
 	for (let i = 0; i < MAX_POWERS; i++) {
-        let pId = build.powers[i];
-        let isActive = (i === activeSlotIndex);
-        let activeClass = isActive ? 'active-slot' : '';
-        let isSelectable = (i <= nextEmpty) ? 'selectable' : 'locked-slot';
+		let pId = build.powers[i];
+		let isActive = (i === activeSlotIndex);
+		let activeClass = isActive ? 'active-slot' : '';
+		let isSelectable = (i <= nextEmpty) ? 'selectable' : 'locked-slot';
 
-        let isInvalid = false;
-        let invalidMsg = "";
+		let isInvalid = false;
+		let invalidMsg = "";
 
-        // Enable dragging for everything except Slot 0
-        let dragAttrs = i > 0 ? `draggable="true" ondragstart="dragStart(event, ${i})" ondragover="dragOver(event, ${i})" ondragleave="dragLeave(event)" ondrop="dropSlot(event, ${i})"` : ``;
+		// Enable dragging for everything except Slot 0
+		let dragAttrs = i > 0 ? `draggable="true" ondragstart="dragStart(event, ${i})" ondragover="dragOver(event, ${i})" ondragleave="dragLeave(event)" ondrop="dropSlot(event, ${i})"` : ``;
 
-        if (pId) {
-            let p = powers.find(x => x.id === pId);
-            
-            let ultCountBefore = 0;
-            for(let j = 0; j < i; j++) {
-                if(build.powers[j] && powers.find(x => x.id === build.powers[j])?.tier == 4) ultCountBefore++;
-            }
-            if (p.tier == 4 && ultCountBefore > 0) {
-                isInvalid = true;
-                invalidMsg = "Multiple Ultimates not allowed";
-            } else if (!checkUnlockForSlot(p, i, build.powers)) {
-                isInvalid = true;
-                invalidMsg = "Tier prerequisites not met";
-            }
+		if (pId) {
+			let p = powers.find(x => x.id === pId);
 
-            let activeAdvs = build.adv[pId] || [];
-            let visibleAdvs = activeAdvs.filter(aName => {
-                if (p.isEnergyUnlock && (aName === "Rank 2" || aName === "Rank 3")) return false;
-                
-                let aObj = p.adv ? p.adv.find(a => a.name === aName) : null;
-                return aObj && !aObj.isHidden;
-            });
-            let advHtml = visibleAdvs.length > 0 ? `<div class="slot-advs" style="font-size: 13px; color: #bbb; margin-top: 4px;">${visibleAdvs.join(' &bull; ')}</div>` : '';
+			let ultCountBefore = 0;
+			for(let j = 0; j < i; j++) {
+				if(build.powers[j] && powers.find(x => x.id === build.powers[j])?.tier == 4) ultCountBefore++;
+			}
+			if (p.tier == 4 && ultCountBefore > 0) {
+				isInvalid = true;
+				invalidMsg = "Multiple Ultimates not allowed";
+			} else if (!checkUnlockForSlot(p, i, build.powers)) {
+				isInvalid = true;
+				invalidMsg = "Tier prerequisites not met";
+			}
 
-            let jumpBtnHtml = `<button class="jump-btn" style="position: absolute; left: -34px; top: 50%; transform: translateY(-50%); background: #ffeb3b; color: #000; border: 2px solid #222; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; z-index: 10; font-size: 16px; font-weight: bold; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.8);" onclick="jumpToPower('${pId}', event)" title="Locate in Library">&#9664;</button>`;
-            let tooltipHtml = isInvalid ? `<div class="invalid-tooltip" style="position: absolute; right: 35px; top: -10px; background: #ff5555; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; pointer-events: none; z-index: 20;">! ${invalidMsg}</div>` : '';
-            
-            let powerDescTooltip = `<div class="power-spec-tooltip"><strong style="color:#4DA8DA; font-size:17px;">${p.name}</strong><br><br>${p.desc}</div>`;
+			let activeAdvs = build.adv[pId] || [];
+			let visibleAdvs = activeAdvs.filter(aName => {
+				if (p.isEnergyUnlock && (aName === "Rank 2" || aName === "Rank 3")) return false;
 
-            let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
-            let finalSlotClass = `slot filled ${activeClass} ${isSelectable} ${isInvalid ? 'invalid-slot' : ''}`;
+				let aObj = p.adv ? p.adv.find(a => a.name === aName) : null;
+				return aObj && !aObj.isHidden;
+			});
+			let advHtml = visibleAdvs.length > 0 ? `<div class="slot-advs" style="font-size: 13px; color: #bbb; margin-top: 4px;">${visibleAdvs.join(' &bull; ')}</div>` : '';
 
-            slotsHtml += `
-            <div class="${finalSlotClass}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})" onmouseenter="this.querySelector('.jump-btn').style.display='flex'" onmouseleave="this.querySelector('.jump-btn').style.display='none'">
-                ${tooltipHtml}
-                ${powerDescTooltip}
-                ${jumpBtnHtml}
-                <div class="slot-icon" style="box-sizing: border-box; border: ${isActive ? (isInvalid ? '2px dashed #ff5555' : '2px dashed #4DA8DA') : '2px solid transparent'}; border-radius: 4px; padding: 2px;">${buildSpriteHTML(p, 1.2)}</div>
-                <div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1; padding-right: 40px; box-sizing: border-box;">
-                    <div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
-                        <span class="slot-name" style="font-size: 20px; text-shadow: 2px 2px 4px #000; font-weight: bold; letter-spacing: 0.5px; color: ${isInvalid ? '#ff5555' : 'inherit'};">${p.name}</span>
-                        <span class="slot-tier" style="font-size: 13px; opacity: 0.7; color: ${isInvalid ? '#ff5555' : 'inherit'};">Tier ${p.tier}</span>
-                    </div>
-                    ${advHtml}
-                </div>
-                <button class="remove-btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #ff5555; font-size: 20px; font-weight: bold; cursor: pointer; opacity: 0.6;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6" onclick="removePowerFromSlot(${i}, event)">X</button>
-            </div>`;
-        } else {
-            let label = i === 0 ? "Energy Builder" : "Select Power...";
-            let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+			let jumpBtnHtml = `<button class="jump-btn" style="position: absolute; left: -34px; top: 50%; transform: translateY(-50%); background: #ffeb3b; color: #000; border: 2px solid #222; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; z-index: 10; font-size: 16px; font-weight: bold; display: none; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.8);" onclick="jumpToPower('${pId}', event)" title="Locate in Library">&#9664;</button>`;
+			let tooltipHtml = isInvalid ? `<div class="invalid-tooltip" style="position: absolute; right: 35px; top: -10px; background: #ff5555; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; pointer-events: none; z-index: 20;">! ${invalidMsg}</div>` : '';
 
-            slotsHtml += `
-            <div class="slot empty ${activeClass} ${isSelectable}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})">
-                <div class="slot-icon"><div style="box-sizing: border-box; width: 50px; height: 50px; border: ${isActive ? '2px dashed #4DA8DA' : '2px dashed rgba(255,255,255,0.2)'}; border-radius: 4px;"></div></div>
-                <div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
-                    <div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
-                        <span class="slot-name" style="color: rgba(255,255,255,0.4); font-size: 20px; font-style: italic;">${label}</span>
-                    </div>
-                </div>
-            </div>`;
-        }
-    }
+			let powerDescTooltip = `<div class="power-spec-tooltip"><strong style="color:#4DA8DA; font-size:17px;">${p.name}</strong><br><br>${p.desc}</div>`;
+
+			let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+			let finalSlotClass = `slot filled ${activeClass} ${isSelectable} ${isInvalid ? 'invalid-slot' : ''}`;
+
+			slotsHtml += `
+			<div class="${finalSlotClass}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})" onmouseenter="this.querySelector('.jump-btn').style.display='flex'" onmouseleave="this.querySelector('.jump-btn').style.display='none'">
+				${tooltipHtml}
+				${powerDescTooltip}
+				${jumpBtnHtml}
+				<div class="slot-icon" style="box-sizing: border-box; border: ${isActive ? (isInvalid ? '2px dashed #ff5555' : '2px dashed #4DA8DA') : '2px solid transparent'}; border-radius: 4px; padding: 2px;">${buildSpriteHTML(p, 1.2)}</div>
+				<div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1; padding-right: 40px; box-sizing: border-box;">
+					<div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
+						<span class="slot-name" style="font-size: 20px; text-shadow: 2px 2px 4px #000; font-weight: bold; letter-spacing: 0.5px; color: ${isInvalid ? '#ff5555' : 'inherit'};">${p.name}</span>
+						<span class="slot-tier" style="font-size: 13px; opacity: 0.7; color: ${isInvalid ? '#ff5555' : 'inherit'};">Tier ${p.tier}</span>
+					</div>
+					${advHtml}
+				</div>
+				<button class="remove-btn" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #ff5555; font-size: 20px; font-weight: bold; cursor: pointer; opacity: 0.6;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6" onclick="removePowerFromSlot(${i}, event)">X</button>
+			</div>`;
+		} else {
+			let label = i === 0 ? "Energy Builder" : "Select Power...";
+			let slotStyle = `position: relative; box-sizing: border-box; width: 100%; margin: 0; background: transparent !important; border: 2px solid transparent !important; border-radius: 4px; padding: 2px 10px; display: flex; align-items: center; gap: 15px; flex: 1; min-height: 0;`;
+
+			slotsHtml += `
+			<div class="slot empty ${activeClass} ${isSelectable}" style="${slotStyle}" ${dragAttrs} onclick="selectSlot(${i})">
+				<div class="slot-icon"><div style="box-sizing: border-box; width: 50px; height: 50px; border: ${isActive ? '2px dashed #4DA8DA' : '2px dashed rgba(255,255,255,0.2)'}; border-radius: 4px;"></div></div>
+				<div class="slot-details" style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
+					<div class="slot-header" style="display: flex; justify-content: space-between; align-items: baseline; width: 100%;">
+						<span class="slot-name" style="color: rgba(255,255,255,0.4); font-size: 20px; font-style: italic;">${label}</span>
+					</div>
+				</div>
+			</div>`;
+		}
+	}
 
 	document.getElementById('selected-slots').innerHTML = slotsHtml;
 
@@ -1653,19 +1653,19 @@ function exportCode() {
 	let vParams = build.variants.map(v => v !== null ? toB36(powerVariants.findIndex(x => x.id === v)) : "").join('.');
 
 	// --- ENCODE TALENTS ROW ---
-    let talentParams = build.talents ? build.talents.map(t => t !== null ? toB36(CO_TALENTS.findIndex(x => x.id === t)) : "").join('.') : "......";
+	let talentParams = build.talents ? build.talents.map(t => t !== null ? toB36(CO_TALENTS.findIndex(x => x.id === t)) : "").join('.') : "......";
 
 	// Appended talentParams as the 8th block parameter
-    const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}-${talentParams}`;
-    const currentUrl = window.location.origin + window.location.pathname; 
-    const fullExportLink = `${currentUrl}?b=${finalCode}`;
-    
-    const exportInput = document.getElementById('export-link');
-    exportInput.value = fullExportLink;
-    
-    navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
-        exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
-    });
+	const finalCode = `${setIdx}-${powerString}-${specString}-${statString}-${dParams}-${cParams}-${vParams}-${talentParams}`;
+	const currentUrl = window.location.origin + window.location.pathname;
+	const fullExportLink = `${currentUrl}?b=${finalCode}`;
+
+	const exportInput = document.getElementById('export-link');
+	exportInput.value = fullExportLink;
+
+	navigator.clipboard.writeText(fullExportLink).then(() => showMessage("Build link copied to clipboard!", "success")).catch(() => {
+		exportInput.select(); document.execCommand('copy'); showMessage("Link generated! Please copy manually.", "success");
+	});
 }
 
 // --- IMPORT SORTING ENGINE (GREEDY METHOD) ---
@@ -1925,17 +1925,17 @@ function importCode(providedCode = null) {
 				if(vIdx !== null && powerVariants[vIdx]) newBuild.variants[i] = powerVariants[vIdx].id;
 			}
 		}
-		
+
 		// --- DECODE TALENTS ROW ---
-        if (blocks[7]) {
-            let talentData = blocks[7].split('.');
-            for(let i = 0; i < 7 && i < talentData.length; i++) {
-                let tIdx = fromB36(talentData[i]);
-                if(tIdx !== null && CO_TALENTS[tIdx]) {
-                    newBuild.talents[i] = CO_TALENTS[tIdx].id;
-                }
-            }
-        }
+		if (blocks[7]) {
+			let talentData = blocks[7].split('.');
+			for(let i = 0; i < 7 && i < talentData.length; i++) {
+				let tIdx = fromB36(talentData[i]);
+				if(tIdx !== null && CO_TALENTS[tIdx]) {
+					newBuild.talents[i] = CO_TALENTS[tIdx].id;
+				}
+			}
+		}
 
 		if (newBuild.powers.some(p => p !== null)) {
 			newBuild.powers = greedySortPowers(newBuild.powers);
